@@ -8,14 +8,14 @@ This project aims to show course prerequisites in a graph form to make it easier
 
 Check it out at https://andersontseng.ca/prerequisites-visualization.
 
-Please note that the data **does** contain errors and omissions. As well, the data from UBC predates the workday migration, and the Langara and SFU data are not being actively updated (data was generated in July 2025). Please consult with your institutions page for the most accurate information <3
+Please note that the data **does** contain errors and omissions. As well, the data from UBC predates the workday migration, and the Langara and SFU data are not being actively updated (data was generated in July 2025). Please consult with your institutions page for the most accurate information. <3
 
 Stack:
 - Next.js, Tailwind, Sigma.js
 
 Thanks to:
-- SFU for making their course data available by API
-- (UBCFinder)[https://www.ubcfinder.com/] and ubcexplorer.io for making UBC course data available.
+- SFU for making their course data available by API.
+- [UBCFinder](https://www.ubcfinder.com/) and ubcexplorer.io (defunct) for making UBC course data available.
 
 
 
