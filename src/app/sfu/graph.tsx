@@ -45,11 +45,11 @@ const GraphLoader: React.FC<{ disableHoverEffect?: boolean }> = ({ disableHoverE
                 // const { default: noverlap } = await import("graphology-layout-noverlap");
 
                 // Load nodes CSV
-                const nodesResponse = await fetch('/data/sfu/nodes.csv');
+                const nodesResponse = await fetch('./data/sfu/nodes.csv');
                 const nodesCSV = await nodesResponse.text();
 
                 // Load links CSV
-                const linksResponse = await fetch('/data/sfu/links.csv');
+                const linksResponse = await fetch('./data/sfu/links.csv');
                 const linksCSV = await linksResponse.text();
 
                 // Parse CSV data
