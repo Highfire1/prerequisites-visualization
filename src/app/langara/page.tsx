@@ -17,7 +17,11 @@ export default function Home() {
           </Link>
         </h1>
         <p className="text-m">
-          Data may have errors or omissions. Check out the github repository for more information.
+          Data may have errors or omissions. Check out the{" "}
+          <Link href="https://github.com/Highfire1/prerequisites-visualization" target="_blank" rel="noopener noreferrer">
+            GitHub repository
+          </Link>{" "}
+          for more information.
         </p>
       </header>
 

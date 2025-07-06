@@ -35,7 +35,7 @@ const Page = () => {
 
       
       <Link
-        href="https://github.com/AndersonTseng/prerequisites-visualization"
+        href="https://github.com/Highfire1/prerequisites-visualization"
         target="_blank"
         rel="noopener noreferrer"
         className="block w-96 text-center py-3 text-white font-bold rounded-lg bg-gray-800 mt-10"
