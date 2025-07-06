@@ -16,12 +16,12 @@ const Page = () => {
         >
           SFU
         </Link>
-        {/* <Link
+        <Link
           href="/ubc"
           className="block w-96 text-center py-3 text-white font-bold rounded-lg bg-[#002145]" // UBC color
         >
           UBC
-        </Link> */}
+        </Link>
         {/* <Link
           href="/langara"
           className="block w-96 text-center py-3 text-white font-bold rounded-lg bg-[#F47920]" // Langara color
