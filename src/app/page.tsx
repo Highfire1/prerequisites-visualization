@@ -22,12 +22,12 @@ const Page = () => {
         >
           UBC
         </Link>
-        {/* <Link
+        <Link
           href="/langara"
           className="block w-96 text-center py-3 text-white font-bold rounded-lg bg-[#F47920]" // Langara color
         >
           Langara
-        </Link> */}
+        </Link>
 
       </div>
 
