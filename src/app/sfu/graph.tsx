@@ -68,7 +68,6 @@ const GraphLoader: React.FC<{ disableHoverEffect?: boolean }> = ({ disableHoverE
                     const nodeColor = getGroupColor(node.group);
 
                     const size = parseInt(node.size) * 2
-                    console.log(size)
 
                     graph.addNode(node.id, {
                         label: node.id,
