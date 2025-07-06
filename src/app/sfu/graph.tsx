@@ -98,16 +98,16 @@ const GraphLoader: React.FC<{ disableHoverEffect?: boolean }> = ({ disableHoverE
                 const positions = forceAtlas2(graph, {
                     iterations: 300,
                     settings: {
-                        gravity: 1,
-                        scalingRatio: 10,
+                        gravity: 20,
+                        scalingRatio: 40,
                         strongGravityMode: false,
-                        barnesHutOptimize: true,
+                        barnesHutOptimize: false,
                         barnesHutTheta: 0.5,
                         slowDown: 1,
                         linLogMode: false,
-                        outboundAttractionDistribution: false,
+                        outboundAttractionDistribution: true,
                         adjustSizes: false,
-                        edgeWeightInfluence: 1
+                        edgeWeightInfluence: 0.4
                     }
                     // settings: {
                     //     gravity: 2, // Increase gravity to spread out the graph more
