@@ -15,7 +15,7 @@ export default function RadialTreePage() {
             <div className="bg-gray-50 px-4 py-4 flex flex-col h-full">
                 <header className='flex-shrink-0'>
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                        <Link href={"/tests"}>Radial Tree</Link>
+                        <Link href={"/dev/course"}>Radial Tree</Link>
                     </h1>
                     <p className="text-gray-600 mb-4">
                         D3.js w/ <Link

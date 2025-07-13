@@ -3,7 +3,7 @@ import Link from 'next/link';
 export default function TestsIndexPage() {
     const tests = [
         {
-            title: 'graph',
+            title: 'force graph',
             path: '/dev/course/graph'
         },
         {
@@ -21,10 +21,10 @@ export default function TestsIndexPage() {
     ];
 
     return (
-        <div className="p-5 font-sans flex flex-col items-center justify-center min-h-screen">
-            <h1 className="text-2xl font-bold mt-10">Prerequisites Visualization Tests</h1>
-            <p className="text-gray-500">
-                Different approaches to visualizing ECON 305 prerequisites with ONE_OF/ALL_OF logic.
+        <div className="p-5 font-sans flex flex-col items-center justify-center min-h-screen bg-gray-200">
+            <h1 className="text-2xl font-bold mt-10 text-black">Experiments</h1>
+            <p className="text-black">
+                Different ways to visualize the prerequisites for a course.
             </p>
 
             <div className="my-6 space-y-4">

@@ -12,12 +12,12 @@ const TangledTreeVisualization = dynamic(
 
 export default function TangledTreePage() {
     return (
-        <div className="p-4">
-            <header className='flex-shrink-0'>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                    <Link href={"/tests"}>Tangled Tree</Link>
+        <div className="p-4 bg-white">
+            <header className='flex-shrink-0 text-black'>
+                <h1 className="text-3xl font-bold mb-2">
+                    <Link href={"/dev/course"}>Tangled Tree</Link>
                 </h1>
-                <p className="text-gray-600 mb-6">
+                <p className=" mb-6">
                     D3.js w/ <Link
                         className='text-blue-600 hover:underline'
                         target='_blank'

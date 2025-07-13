@@ -260,6 +260,10 @@ export const TangledTreeVisualization: React.FC = () => {
     };
 
     if (!svgRef.current) return;
+    
+    // Clear previous visualization
+    d3.select(svgRef.current).selectAll("*").remove();
+
     const levels = convertToLevels();
     const { nodes, links, layout } = constructTangleLayout(levels);
 
