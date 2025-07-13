@@ -7,9 +7,13 @@ export default function TestsIndexPage() {
             path: '/tests/course-graph'
         },
         {
-            title: 'course tree',
+            title: 'course horizontal tree',
             path: '/tests/course-tree'
-        }
+        },
+        {
+            title: 'course radial tree',
+            path: '/tests/course-radial-tree'
+        },
     ];
 
     return (
