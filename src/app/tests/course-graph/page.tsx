@@ -12,8 +12,8 @@ export default function TestPage() {
     <div className="w-screen h-screen flex flex-col">
       <header className="m-2">
         <h1 className="text-3xl font-bold">
-          <Link href={"/"}>
-            Test: Course Prerequisites Graph
+          <Link href={"/tests"}>
+            Force Directed Node Graph
           </Link>
         </h1>
         <p className="text-m">

@@ -16,7 +16,7 @@ export default function TreePage() {
 
                 <header className='flex-shrink-0'>
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                        Prerequisites Tree Visualization
+                        <Link href={"/tests"}>Tree</Link>
                     </h1>
                     <p className="text-gray-600 mb-6">
                         D3.js w/ <Link
