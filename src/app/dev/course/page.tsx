@@ -3,20 +3,20 @@ import Link from 'next/link';
 export default function TestsIndexPage() {
     const tests = [
         {
-            title: 'course graph',
-            path: '/tests/course/graph'
+            title: 'graph',
+            path: '/dev/course/graph'
         },
         {
-            title: 'course horizontal tree',
-            path: '/tests/course/tree'
+            title: 'horizontal tree',
+            path: '/dev/course/tree'
         },
         {
-            title: 'course radial tree',
-            path: '/tests/course/radial-tree'
+            title: 'radial tree',
+            path: '/dev/course/radial-tree'
         },
         {
             title: 'tangled tree',
-            path: '/tests/course/tangled-tree'
+            path: '/dev/course/tangled-tree'
         }
     ];
 
