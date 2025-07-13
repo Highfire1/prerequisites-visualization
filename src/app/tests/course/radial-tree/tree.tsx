@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 "use client";
 import React, { useRef, useEffect } from "react";
 import * as d3 from "d3";
@@ -18,31 +20,31 @@ const RadialTreeVisualization: React.FC<RadialTreeVisualizationProps> = ({
     const svgRef = useRef<SVGSVGElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
 
-    // Function to recursively expand prerequisites with depth limit
-    const expandPrerequisites = (node: PrereqNode, currentDepth: number = 0): PrereqNode => {
-        if (currentDepth >= maxDepth) {
-            // Stop expanding at max depth
-            return node;
-        }
-        
-        if (node.type === "transcript" && node.course && prerequisiteData[node.course]) {
-            // This course has prerequisites, add them as children
-            return {
-                ...node,
-                children: [expandPrerequisites(prerequisiteData[node.course], currentDepth + 1)]
-            } as any;
-        } else if (node.type === "group") {
-            // Recursively expand children in groups
-            return {
-                ...node,
-                children: node.children.map(child => expandPrerequisites(child, currentDepth))
-            };
-        }
-        // No prerequisites for this node
-        return node;
-    };
-
     useEffect(() => {
+        // Function to recursively expand prerequisites with depth limit
+        const expandPrerequisites = (node: PrereqNode, currentDepth: number = 0): PrereqNode => {
+            if (currentDepth >= maxDepth) {
+                // Stop expanding at max depth
+                return node;
+            }
+            
+            if (node.type === "transcript" && node.course && prerequisiteData[node.course]) {
+                // This course has prerequisites, add them as children
+                return {
+                    ...node,
+                    children: [expandPrerequisites(prerequisiteData[node.course], currentDepth + 1)]
+                } as any;
+            } else if (node.type === "group") {
+                // Recursively expand children in groups
+                return {
+                    ...node,
+                    children: node.children.map(child => expandPrerequisites(child, currentDepth))
+                };
+            }
+            // No prerequisites for this node
+            return node;
+        };
+
         if (!svgRef.current || !containerRef.current) return;
         
         // Get container dimensions
@@ -105,7 +107,7 @@ const RadialTreeVisualization: React.FC<RadialTreeVisualizationProps> = ({
             .selectAll("path")
             .data(root.links())
             .join("path")
-            // @ts-ignore: D3 type inference issue
+            // @ts-expect-error: D3 type inference issue
             .attr("d", d3.linkRadial()
                 .angle((d: any) => d.x)
                 .radius((d: any) => d.y)
@@ -146,7 +148,6 @@ const RadialTreeVisualization: React.FC<RadialTreeVisualizationProps> = ({
                 if (node.type === "group") return node.logic.replace("_", " ");
                 if (node.type === "note") return node.text?.substring(0, 30) + "...";
                 if (node.type === "other") return node.text?.substring(0, 30) + "...";
-                // @ts-ignore: fallback for union type
                 return (node as any).type;
             });
 

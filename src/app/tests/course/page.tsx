@@ -4,16 +4,20 @@ export default function TestsIndexPage() {
     const tests = [
         {
             title: 'course graph',
-            path: '/tests/course-graph'
+            path: '/tests/course/graph'
         },
         {
             title: 'course horizontal tree',
-            path: '/tests/course-tree'
+            path: '/tests/course/tree'
         },
         {
             title: 'course radial tree',
-            path: '/tests/course-radial-tree'
+            path: '/tests/course/radial-tree'
         },
+        {
+            title: 'tangled tree',
+            path: '/tests/course/tangled-tree'
+        }
     ];
 
     return (
