@@ -20,8 +20,19 @@ import {
 } from 'react-icons/ai';
 import { MdFilterCenterFocus } from 'react-icons/md';
 
-// Test data structure
-const testData = {
+// Type definitions
+interface PrerequisiteNode {
+    type: string;
+    logic?: string;
+    course?: string;
+    minGrade?: string;
+    canBeTakenConcurrently?: string;
+    creditCount?: number;
+    text?: string;
+    children?: PrerequisiteNode[];
+}
+
+const testData: PrerequisiteNode = {
     "type": "group",
     "logic": "ONE_OF",
     "children": [
@@ -112,7 +123,7 @@ const TestGraphLoader: React.FC<{ disableHoverEffect?: boolean }> = ({ disableHo
                 };
 
                 // Helper function to create label text
-                const createLabel = (node: any) => {
+                const createLabel = (node: PrerequisiteNode) => {
                     switch (node.type) {
                         case 'group':
                             return '' // return `${node.logic.replace('_', ' ')}`;
@@ -123,19 +134,19 @@ const TestGraphLoader: React.FC<{ disableHoverEffect?: boolean }> = ({ disableHo
                         case 'creditCount':
                             return `${node.creditCount} Credits`;
                         case 'note':
-                            return `Note: ${node.text.substring(0, 30)}...`;
+                            return `Note: ${node.text?.substring(0, 30) || 'No text'}...`;
                         default:
                             return 'Unknown';
                     }
                 };
 
                 // Recursive function to build graph from data structure
-                const buildGraph = (node: any, parentId: number | null = null): number[] => {
+                const buildGraph = (node: PrerequisiteNode, parentId: number | null = null): number[] => {
                     // Special handling for ONE_OF groups - skip the node and return child IDs
                     if (node.type === 'group' && node.logic === 'ONE_OF') {
                         const childIds: number[] = [];
                         if (node.children && Array.isArray(node.children)) {
-                            node.children.forEach((child: any) => {
+                            node.children.forEach((child: PrerequisiteNode) => {
                                 const childNodeIds = buildGraph(child, parentId);
                                 childIds.push(...childNodeIds);
                             });
@@ -166,7 +177,7 @@ const TestGraphLoader: React.FC<{ disableHoverEffect?: boolean }> = ({ disableHo
 
                     // Process children if they exist
                     if (node.children && Array.isArray(node.children)) {
-                        node.children.forEach((child: any) => {
+                        node.children.forEach((child: PrerequisiteNode) => {
                             buildGraph(child, currentId);
                         });
                     }
@@ -188,7 +199,7 @@ const TestGraphLoader: React.FC<{ disableHoverEffect?: boolean }> = ({ disableHo
                 });
 
                 // Connect each prerequisite path to the target course with "ONE_OF" labeled edges
-                prerequisiteNodeIds.forEach((prereqId, index) => {
+                prerequisiteNodeIds.forEach((prereqId) => {
                     graph.addEdge(prereqId.toString(), targetId.toString(), {
                         size: 3,
                         color: '#DC2626',
@@ -227,7 +238,7 @@ const TestGraphLoader: React.FC<{ disableHoverEffect?: boolean }> = ({ disableHo
 
                 // Register hover events after loading the graph
                 registerEvents({
-                    enterNode: (event) => setHoveredNode(event.node),
+                    enterNode: (event: { node: string }) => setHoveredNode(event.node),
                     leaveNode: () => setHoveredNode(null),
                 });
 

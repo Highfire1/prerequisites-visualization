@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 
 import React, { useEffect, useRef } from 'react';
@@ -55,12 +56,17 @@ const testData = {
     ]
 };
 
-// Target course that requires these prerequisites
-const targetCourse = {
-    "type": "transcript",
-    "course": "ECON 305",
-    "isTarget": true
-};
+interface TestDataNode {
+    type: string;
+    logic?: string;
+    course?: string;
+    minGrade?: string;
+    canBeTakenConcurrently?: string; // String in test data
+    creditCount?: number;
+    text?: string;
+    isTarget?: boolean;
+    children?: TestDataNode[];
+}
 
 interface TreeNode {
     id: string;
@@ -68,11 +74,11 @@ interface TreeNode {
     logic?: string;
     course?: string;
     minGrade?: string;
-    canBeTakenConcurrently?: string;
+    canBeTakenConcurrently?: boolean;
     creditCount?: number;
     text?: string;
     isTarget?: boolean;
-    children?: TreeNode[];
+    children: TreeNode[];
 }
 
 const D3TreeVisualization: React.FC = () => {
@@ -101,7 +107,7 @@ const D3TreeVisualization: React.FC = () => {
                 .attr("transform", `translate(${margin.left},${margin.top})`);
 
         // Transform data into D3 hierarchy format
-        const transformData = (node: any, parent: TreeNode | null = null): TreeNode => {
+        const transformData = (node: TestDataNode): TreeNode => {
             const id = Math.random().toString(36).substr(2, 9);
             
             const treeNode: TreeNode = {
@@ -110,7 +116,7 @@ const D3TreeVisualization: React.FC = () => {
                 logic: node.logic,
                 course: node.course,
                 minGrade: node.minGrade,
-                canBeTakenConcurrently: node.canBeTakenConcurrently,
+                canBeTakenConcurrently: node.canBeTakenConcurrently === "true",
                 creditCount: node.creditCount,
                 text: node.text,
                 isTarget: node.isTarget,
@@ -118,7 +124,7 @@ const D3TreeVisualization: React.FC = () => {
             };
 
             if (node.children && Array.isArray(node.children)) {
-                treeNode.children = node.children.map((child: any) => transformData(child, treeNode));
+                treeNode.children = node.children.map((child: TestDataNode) => transformData(child));
             }
 
             return treeNode;
@@ -151,6 +157,7 @@ const D3TreeVisualization: React.FC = () => {
         treeLayout(root);
 
         // Helper functions for styling
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const getNodeColor = (d: any): string => {
             const node = d.data as TreeNode;
             if (node.isTarget) return '#DC2626'; // Red for target
@@ -163,6 +170,7 @@ const D3TreeVisualization: React.FC = () => {
             }
         };
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const getNodeSize = (d: any): number => {
             const node = d.data as TreeNode;
             if (node.isTarget) return 8;
@@ -175,6 +183,7 @@ const D3TreeVisualization: React.FC = () => {
             }
         };
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const getNodeLabel = (d: any): string => {
             const node = d.data as TreeNode;
             switch (node.type) {
@@ -199,6 +208,7 @@ const D3TreeVisualization: React.FC = () => {
             .enter()
             .append('path')
             .attr('class', 'link')
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .attr('d', d3.linkVertical<any, any>()
                 .x(d => d.y)
                 .y(d => d.x)
