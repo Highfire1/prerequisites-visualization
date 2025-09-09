@@ -216,7 +216,7 @@ export default function GraphFunctionalPage() {
 		clampPad: 24,       // viewport clamp padding
 		pinClicked: false,  // pin nodes when clicked (persisted)
 		animate: true,      // animate layout steps
-		showRings: true,   // debug: render ring guides
+		showRings: false,   // debug: render ring guides
 		ringCount: 4,       // number of guide rings to draw
 		useParentAnchors: true, // place deeper rings near parents' angles
 		ringSpacingPad: 16, // extra spacing for same-ring angular separation
@@ -1056,7 +1056,7 @@ export default function GraphFunctionalPage() {
 									onChange={(e) => setSettings(s => ({ ...s, sepPadding: Number(e.target.value) }))} />
 								<span className="w-10 text-right">{settings.sepPadding}</span>
 							</label>
-							<label className="flex items-center justify-between gap-2">
+							{/* <label className="flex items-center justify-between gap-2">
 								<span>Ring spring</span>
 								<input type="range" min={0} max={0.6} step={0.01} value={settings.ringSpring}
 									onChange={(e) => setSettings(s => ({ ...s, ringSpring: Number(e.target.value) }))} />
@@ -1084,7 +1084,7 @@ export default function GraphFunctionalPage() {
 								<input type="checkbox" checked={settings.pinClicked}
 									onChange={(e) => setSettings(s => ({ ...s, pinClicked: e.target.checked }))} />
 								<span>Pin nodes on click</span>
-							</label>
+							</label> */}
 							<label className="flex items-center gap-2">
 								<input type="checkbox" checked={settings.animate}
 									onChange={(e) => setSettings(s => ({ ...s, animate: e.target.checked }))} />
