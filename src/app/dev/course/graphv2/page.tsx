@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { prerequisiteData, type PrereqNode } from "./prerequisiteData";
+import { prerequisiteData, type PrereqNode, type TranscriptNode } from "./prerequisiteData";
+
+// Root course can be changed from UI
 
 type SimNode = {
 	id: string; // course id like ECON 201
@@ -121,11 +123,117 @@ function NodeCard({
 	onButtonHoverOut: (parentId: string, courseId: string) => void;
 	showMinGrade: boolean;
 }) {
-	const groups = useMemo(() => extractPrereqCourseGroups(n.id), [n.id]);
 	const course = prerequisiteData[n.id];
 	const missingData = !course;
 	const noPrereqs = !missingData && course?.prerequisites == null;
 	const subtitle = n.subtitle ?? course?.title;
+
+	const renderTranscript = (id: string, minGrade?: string) => (
+		<button
+			data-pan-block
+			className={
+				"px-2 py-1 rounded border " +
+				(presentSet.has(id)
+					? "border-blue-500 bg-blue-50 text-blue-700"
+					: "border-gray-300 hover:border-blue-400 hover:bg-blue-50 active:bg-blue-100")
+			}
+			onClick={(e) => {
+				e.stopPropagation();
+				onButtonClick(n.id, id);
+			}}
+			onMouseEnter={(e) => {
+				e.stopPropagation();
+				onButtonHoverIn(n.id, id);
+			}}
+			onMouseLeave={(e) => {
+				e.stopPropagation();
+				onButtonHoverOut(n.id, id);
+			}}
+		>
+			{showMinGrade && minGrade ? `${id} (${minGrade})` : id}
+		</button>
+	);
+
+	const renderNode = (node: PrereqNode): React.ReactNode => {
+		if (!node) return null;
+		if (node.type === "transcript") {
+			return renderTranscript(node.course, node.minGrade);
+		}
+		if (node.type === "group") {
+			type Child = Exclude<PrereqNode, null>;
+			const isTranscriptNode = (n: PrereqNode): n is TranscriptNode => !!n && n.type === "transcript";
+			const children = (node.children ?? []).filter(Boolean) as Child[];
+			if (children.length === 0) return null;
+			if (node.logic === "ONE_OF") {
+				const allTranscript = children.every((c) => isTranscriptNode(c));
+				if (allTranscript) {
+					return (
+						<div className="flex flex-wrap items-center gap-1 text-xs">
+							{(children as TranscriptNode[]).map((c, j) => (
+								<React.Fragment key={c.course}>
+									{renderTranscript(c.course, c.minGrade)}
+									{j < children.length - 1 ? (
+										<span className="text-gray-500">or</span>
+									) : null}
+								</React.Fragment>
+							))}
+						</div>
+					);
+				}
+				// Complex ONE_OF: show each alternative as a block with 'or' separators (no heading)
+				return (
+					<div className="flex flex-col gap-1 text-xs">
+						{children.map((c, idx) => (
+							<React.Fragment key={idx}>
+								<div className="pl-2 border-l border-dashed border-gray-300">
+									{renderNode(c)}
+								</div>
+								{idx < children.length - 1 ? (
+									<div className="text-gray-500 pl-2">or</div>
+								) : null}
+							</React.Fragment>
+						))}
+					</div>
+				);
+			}
+			// ALL_OF: if all are transcripts, render inline with 'and'; else stack with 'and' separators
+			const allTranscriptAll = children.every((c) => isTranscriptNode(c));
+			if (allTranscriptAll) {
+				return (
+					<div className="flex flex-wrap items-center gap-1 text-xs">
+						{(children as TranscriptNode[]).map((c, idx) => (
+							<React.Fragment key={c.course}>
+								{renderTranscript(c.course, c.minGrade)}
+								{idx < children.length - 1 ? (
+									<span className="text-gray-500">and</span>
+								) : null}
+							</React.Fragment>
+						))}
+					</div>
+				);
+			}
+			return (
+				<div className="flex flex-col gap-1 text-xs">
+					{children.map((c, idx) => (
+						<React.Fragment key={idx}>
+							<div className="pl-2 border-l border-dashed border-gray-300">{renderNode(c)}</div>
+							{idx < children.length - 1 ? (
+								<div className="text-gray-500 pl-2">and</div>
+							) : null}
+						</React.Fragment>
+					))}
+				</div>
+			);
+		}
+		if (node.type === "creditCount") {
+			return <div className="text-gray-600">{node.creditCount} credits</div>;
+		}
+		if (node.type === "note" || node.type === "other") {
+			return <div className="text-gray-800">{node.text}</div>;
+		}
+		// Fallback for unknown types
+		return null;
+	};
 
 	return (
 		<div
@@ -148,47 +256,12 @@ function NodeCard({
 				) : null}
 			</div>
 			<div className="p-3">
-				{groups.length > 0 ? (
+		{course && course.prerequisites ? (
 					<>
 						<div className="text-xs font-medium text-gray-700 mb-1">
 							Prerequisites:
 						</div>
-						<div className="flex flex-col gap-1">
-							{groups.map((alts, i) => (
-								<div key={i} className="flex flex-wrap items-center gap-1 text-xs">
-									{alts.map((req, j) => (
-										<React.Fragment key={req.id}>
-											<button
-												data-pan-block
-												className={
-													"px-2 py-1 rounded border " +
-													(presentSet.has(req.id)
-														? "border-blue-500 bg-blue-50 text-blue-700"
-														: "border-gray-300 hover:border-blue-400 hover:bg-blue-50 active:bg-blue-100")
-												}
-												onClick={(e) => {
-													e.stopPropagation();
-													onButtonClick(n.id, req.id);
-												}}
-												onMouseEnter={(e) => {
-													e.stopPropagation();
-													onButtonHoverIn(n.id, req.id);
-												}}
-												onMouseLeave={(e) => {
-													e.stopPropagation();
-													onButtonHoverOut(n.id, req.id);
-												}}
-											>
-												{showMinGrade && req.minGrade ? `${req.id} (${req.minGrade})` : req.id}
-											</button>
-											{j < alts.length - 1 ? (
-												<span className="text-gray-500">or</span>
-											) : null}
-										</React.Fragment>
-									))}
-								</div>
-							))}
-						</div>
+						<div className="flex flex-col gap-1 text-xs">{renderNode(course.prerequisites)}</div>
 					</>
 					) : (
 						<div className="text-xs text-gray-500">{missingData ? "No prerequisite data found." : noPrereqs ? "No prerequisites." : "No prerequisites."}</div>
@@ -202,6 +275,9 @@ export default function GraphFunctionalPage() {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const svgRef = useRef<SVGSVGElement>(null);
 	const depthRef = useRef<Map<string, number>>(new Map());
+
+	// Dynamic root id (default ECON 201)
+	const [rootId, setRootId] = useState<string>("ECON 201");
 
 	const [nodes, setNodes] = useState<SimNode[]>([]);
 	const [links, setLinks] = useState<SimLink[]>([]);
@@ -329,16 +405,16 @@ export default function GraphFunctionalPage() {
 		return () => el.removeEventListener('wheel', onWheel);
 	}, []);
 
-	// Initialize root node ECON 201 pinned (layout effect to avoid first-paint jump)
+	// Initialize/reset root node when rootId changes (layout effect to avoid first-paint jump)
 	useLayoutEffect(() => {
 		if (!containerRef.current) return;
 		const rect = containerRef.current.getBoundingClientRect();
 		const cx = rect.width / 2;
 		const cy = rect.height / 2;
-		const rootData = prerequisiteData["ECON 201"];    
+		const rootData = prerequisiteData[rootId];    
 		const root: SimNode = {
-			id: "ECON 201",
-			title: "ECON 201",
+			id: rootId,
+			title: rootId,
 			subtitle: rootData?.title,
 			persisted: true,
 			pinned: true,
@@ -350,9 +426,11 @@ export default function GraphFunctionalPage() {
 			y: cy,
 		};
 		setNodes([root]);
-	}, []);
+		setLinks([]);
+		setReopenMemory(new Map());
+	}, [rootId]);
 
-		// Precompute depths from ECON 201 using prerequisiteData
+		// Precompute depths from root using prerequisiteData
 		useEffect(() => {
 			const buildAdj = (): Map<string, string[]> => {
 				const m = new Map<string, string[]>();
@@ -379,8 +457,8 @@ export default function GraphFunctionalPage() {
 				return depth;
 			};
 			const adj = buildAdj();
-			depthRef.current = bfs("ECON 201", adj);
-		}, []);
+			depthRef.current = bfs(rootId, adj);
+		}, [rootId]);
 
 	// Custom deterministic layout: concentric rings by depth + pairwise separation (bounce)
 	useEffect(() => {
@@ -388,7 +466,7 @@ export default function GraphFunctionalPage() {
 		if (!nodesRef.current.length) return;
 
 		const rect = containerRef.current.getBoundingClientRect();
-		const root = nodesRef.current.find((n) => n.id === "ECON 201");
+		const root = nodesRef.current.find((n) => n.id === rootId);
 		const cx = root?.fx ?? rect.width / 2;
 		const cy = root?.fy ?? rect.height / 2;
 
@@ -410,7 +488,7 @@ export default function GraphFunctionalPage() {
 		// - depth 1: deterministic, even spacing
 		// - depth >= 2: parent-centered clusters; siblings pack tightly around the parent's angle.
 		const angleMap = new Map<string, number>();
-		angleMap.set("ECON 201", 0);
+		angleMap.set(rootId, 0);
 		// (circular helpers no longer needed; using segment-based packing)
 		// sort depths ascending for sequential dependency (need d-1 angles first)
 		const presentDepths = Array.from(depthGroups.keys()).sort((a, b) => a - b);
@@ -619,8 +697,8 @@ export default function GraphFunctionalPage() {
 						} else {
 							mx = (dx === 0 ? (Math.random() < 0.5 ? -1 : 1) : Math.sign(dx)) * overlapX;
 						}
-						const aPinned = a.pinned || a.hoverPinned || a.id === "ECON 201";
-						const bPinned = b.pinned || b.hoverPinned || b.id === "ECON 201";
+						const aPinned = a.pinned || a.hoverPinned || a.id === rootId;
+						const bPinned = b.pinned || b.hoverPinned || b.id === rootId;
 						if (aPinned && bPinned) continue;
 						if (aPinned) {
 							b.x = (b.x ?? bx) + mx * 0.9;
@@ -640,7 +718,7 @@ export default function GraphFunctionalPage() {
 
 			// Ring correction towards desired radius from center
 			nodesRef.current.forEach((n) => {
-				if (n.pinned || n.hoverPinned || n.id === "ECON 201") return;
+				if (n.pinned || n.hoverPinned || n.id === rootId) return;
 				const t = targets.get(n.id) ?? ensureTargetForNode(n);
 				const dx = (n.x ?? t.x) - cx;
 				const dy = (n.y ?? t.y) - cy;
@@ -693,6 +771,7 @@ export default function GraphFunctionalPage() {
 		settings.ringSpacingPad,
 		settings.useParentAnchors,
 		settings.animate,
+		rootId,
 	]);
 
 	// Helpers to mutate graph
@@ -1069,6 +1148,21 @@ export default function GraphFunctionalPage() {
 				ref={containerRef}
 				className={`relative w-full h-full bg-gray-50 border border-gray-200 rounded-lg overflow-hidden ${isPanning ? 'cursor-grabbing' : 'cursor-grab'}`}
 			>
+					{/* Root selector (top-left) */}
+					<div data-pan-block className="absolute top-2 left-2 z-20 bg-white/90 backdrop-blur rounded-lg border border-gray-200 shadow p-2 text-xs text-gray-800">
+						<label className="flex items-center gap-2">
+							<span className="text-gray-700">Root</span>
+							<select
+								className="border border-gray-300 rounded px-1 py-0.5 bg-white"
+								value={rootId}
+								onChange={(e) => setRootId(e.target.value)}
+							>
+								<option value="ECON 201">ECON 201</option>
+								<option value="ECON 305">ECON 305</option>
+								<option value="CMPT 225">CMPT 225</option>
+							</select>
+						</label>
+					</div>
 					{/* Controls */}
 					<div data-pan-block className="absolute top-2 right-2 z-20 w-72 bg-white/90 backdrop-blur rounded-lg border border-gray-200 shadow p-3 text-xs text-gray-800">
 						<div className="font-medium text-gray-700 mb-2">Layout controls</div>
@@ -1227,7 +1321,7 @@ export default function GraphFunctionalPage() {
 						{settings.showRings ? (
 							<g>
 								{(() => {
-									const root = nodesRef.current.find((n) => n.id === "ECON 201");
+									const root = nodesRef.current.find((n) => n.id === rootId);
 									// If root isn't available yet, don't render rings to avoid initial flicker/jump
 									if (!root) return null;
 									const cx = (root.fx ?? root.x ?? 0);

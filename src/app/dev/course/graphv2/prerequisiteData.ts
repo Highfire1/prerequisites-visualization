@@ -38,6 +38,368 @@ export type CourseData = {
 
 // All prerequisite data organized by course
 export const prerequisiteData: Record<string, CourseData> = {
+    "CMPT 225": {
+        title: "Data Structures and Programming",
+        prerequisites: {
+            type: "group",
+            logic: "ONE_OF",
+            children: [
+                {
+                    type: "group",
+                    logic: "ALL_OF",
+                    children: [
+                        {
+                            type: "transcript",
+                            course: "MACM 101",
+                            minGrade: "C-"
+                        },
+                        {
+                            type: "group",
+                            logic: "ONE_OF",
+                            children: [
+                                {
+                                    type: "transcript",
+                                    course: "CMPT 125",
+                                    minGrade: "C-"
+                                },
+                                {
+                                    type: "transcript",
+                                    course: "CMPT 129",
+                                    minGrade: "C-"
+                                },
+                                {
+                                    type: "transcript",
+                                    course: "CMPT 135",
+                                    minGrade: "C-"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    type: "group",
+                    logic: "ALL_OF",
+                    children: [
+                        {
+                            type: "transcript",
+                            course: "ENSC 251",
+                            minGrade: "C-"
+                        },
+                        {
+                            type: "transcript",
+                            course: "ENSC 252",
+                            minGrade: "C-"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+
+    "MACM 101": {
+        title: "Discrete Mathematics I",
+        prerequisites: {
+            type: "group",
+            logic: "ONE_OF",
+            children: [
+                {
+                    type: "transcript",
+                    course: "BC Math 12",
+                    orEquivalent: true
+                },
+                {
+                    type: "transcript",
+                    course: "MATH 100",
+                    minGrade: "C-"
+                },
+                {
+                    type: "transcript",
+                    course: "MATH 150",
+                    minGrade: "C-"
+                },
+                {
+                    type: "transcript",
+                    course: "MATH 151",
+                    minGrade: "C-"
+                },
+                {
+                    type: "transcript",
+                    course: "MATH 154",
+                    minGrade: "C-"
+                },
+                {
+                    type: "transcript",
+                    course: "MATH 157",
+                    minGrade: "C-"
+                }
+            ]
+        }
+    },
+
+    "CMPT 125": {
+        title: "Introduction to Computing Science and Programming II",
+        prerequisites: {
+            type: "transcript",
+            course: "CMPT 120",
+            minGrade: "C-"
+        }
+    },
+
+    "CMPT 120": {
+        title: "Introduction to Computing Science and Programming I",
+        prerequisites: null
+    },
+
+    "CMPT 130": {
+        title: "Introduction to Computer Programming I",
+        prerequisites: {
+            type: "group",
+            logic: "ONE_OF",
+            children: [
+                {
+                    type: "transcript",
+                    course: "BC Math 12",
+                    orEquivalent: true
+                },
+                {
+                    type: "transcript",
+                    course: "MATH 100",
+                    minGrade: "C-"
+                },
+                {
+                    type: "transcript",
+                    course: "MATH 150",
+                    minGrade: "C-"
+                },
+                {
+                    type: "transcript",
+                    course: "MATH 151",
+                    minGrade: "C-"
+                },
+                {
+                    type: "transcript",
+                    course: "MATH 154",
+                    minGrade: "C-"
+                },
+                {
+                    type: "transcript",
+                    course: "MATH 157",
+                    minGrade: "C-"
+                }
+            ]
+        }
+    },
+
+    "CMPT 129": {
+        title: "Introduction to Computing Science and Programming for Mathematics and Statistics",
+        prerequisites: {
+            type: "transcript",
+            course: "CMPT 102",
+            minGrade: "C-"
+        }
+    },
+
+    "CMPT 102": {
+        title: "Introduction to Scientific Computer Programming",
+        prerequisites: {
+            type: "group",
+            logic: "ONE_OF",
+            children: [
+                {
+                    type: "transcript",
+                    course: "MATH 152",
+                    canBeTakenConcurrently: "true"
+                },
+                {
+                    type: "transcript",
+                    course: "MATH 155",
+                    canBeTakenConcurrently: "true"
+                },
+                {
+                    type: "transcript",
+                    course: "MATH 158",
+                    canBeTakenConcurrently: "true"
+                }
+            ]
+        }
+    },
+
+    "MATH 155": {
+        title: "Mathematics for the Life Sciences II",
+        prerequisites: {
+            type: "group",
+            logic: "ONE_OF",
+            children: [
+                {
+                    type: "transcript",
+                    course: "MATH 150",
+                    minGrade: "C-"
+                },
+                {
+                    type: "transcript",
+                    course: "MATH 151",
+                    minGrade: "C-"
+                },
+                {
+                    type: "transcript",
+                    course: "MATH 154",
+                    minGrade: "C-"
+                },
+                {
+                    type: "transcript",
+                    course: "MATH 157",
+                    minGrade: "B"
+                }
+            ]
+        }
+    },
+
+    "MATH 158": {
+        title: "Calculus II for the Social Sciences",
+        prerequisites: {
+            type: "group",
+            logic: "ONE_OF",
+            children: [
+                {
+                    type: "transcript",
+                    course: "MATH 150",
+                    minGrade: "C-"
+                },
+                {
+                    type: "transcript",
+                    course: "MATH 151",
+                    minGrade: "C-"
+                },
+                {
+                    type: "transcript",
+                    course: "MATH 154",
+                    minGrade: "C-"
+                },
+                {
+                    type: "transcript",
+                    course: "MATH 157",
+                    minGrade: "C-"
+                }
+            ]
+        }
+    },
+
+    "CMPT 135": {
+        title: "Introduction to Computer Programming II",
+        prerequisites: {
+            type: "transcript",
+            course: "CMPT 130",
+            minGrade: "C-"
+        }
+    },
+
+    "ENSC 251": {
+        title: "Software Design and Analysis for Engineers",
+        prerequisites: {
+            type: "group",
+            logic: "ONE_OF",
+            children: [
+                {
+                    type: "transcript",
+                    course: "ENSC 151",
+                    minGrade: "C-"
+                },
+                {
+                    type: "transcript",
+                    course: "CMPT 135",
+                    minGrade: "C-"
+                },
+                {
+                    type: "group",
+                    logic: "ALL_OF",
+                    children: [
+                        {
+                            type: "transcript",
+                            course: "CMPT 125",
+                            minGrade: "C-"
+                        },
+                        {
+                            type: "transcript",
+                            course: "CMPT 127",
+                            minGrade: "C-"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+
+    "ENSC 151": {
+        title: "Introduction to Software Development for Engineers",
+        prerequisites: {
+            type: "group",
+            logic: "ONE_OF",
+            children: [
+                {
+                    type: "transcript",
+                    course: "BC Math 12",
+                    orEquivalent: true
+                },
+                {
+                    type: "transcript",
+                    course: "MATH 100",
+                    minGrade: "C-"
+                },
+                {
+                    type: "transcript",
+                    course: "MATH 150",
+                    minGrade: "C-"
+                },
+                {
+                    type: "transcript",
+                    course: "MATH 151",
+                    minGrade: "C-"
+                },
+                {
+                    type: "transcript",
+                    course: "MATH 154",
+                    minGrade: "C-"
+                },
+                {
+                    type: "transcript",
+                    course: "MATH 157",
+                    minGrade: "C-"
+                }
+            ]
+        }
+    },
+
+    "ENSC 252": {
+        title: "Fundamentals of Digital Logic & Design",
+        prerequisites: {
+            type: "group",
+            logic: "ONE_OF",
+            children: [
+                {
+                    type: "transcript",
+                    course: "ENSC 151",
+                    minGrade: "C-"
+                },
+                {
+                    type: "transcript",
+                    course: "CMPT 125",
+                    minGrade: "C-"
+                },
+                {
+                    type: "transcript",
+                    course: "CMPT 126",
+                    minGrade: "C-"
+                },
+                {
+                    type: "transcript",
+                    course: "CMPT 135",
+                    minGrade: "C-"
+                }
+            ]
+        }
+    },
+
+
     "ECON 305": {
         title: "Intermediate Macroeconomic Theory",
         prerequisites: {
@@ -231,37 +593,19 @@ export const prerequisiteData: Record<string, CourseData> = {
             logic: "ONE_OF",
             children: [
                 {
-                    type: "group",
-                    logic: "ALL_OF",
-                    children: [
-                        {
-                            type: "transcript",
-                            course: "Pre-Calculus 12",
-                            minGrade: "B"
-                        }
-                    ]
+                    type: "transcript",
+                    course: "Pre-Calculus 12",
+                    minGrade: "B"
                 },
                 {
-                    type: "group",
-                    logic: "ALL_OF",
-                    children: [
-                        {
-                            type: "transcript",
-                            course: "MATH 100",
-                            minGrade: "C-"
-                        }
-                    ]
+                    type: "transcript",
+                    course: "MATH 100",
+                    minGrade: "B"
                 },
                 {
-                    type: "group",
-                    logic: "ALL_OF",
-                    children: [
-                        {
-                            type: "transcript",
-                            course: "MATH 110",
-                            minGrade: "C-"
-                        }
-                    ]
+                    type: "transcript",
+                    course: "MATH 110",
+                    minGrade: "C-"
                 }
             ]
         }
@@ -274,44 +618,26 @@ export const prerequisiteData: Record<string, CourseData> = {
             logic: "ONE_OF",
             children: [
                 {
-                    type: "group",
-                    logic: "ALL_OF",
-                    children: [
-                        {
-                            type: "transcript",
-                            course: "Pre-Calculus 12",
-                            minGrade: "B"
-                        }
-                    ]
+                    type: "transcript",
+                    course: "Pre-Calculus 12",
+                    minGrade: "B"
                 },
                 {
-                    type: "group",
-                    logic: "ALL_OF",
-                    children: [
-                        {
-                            type: "transcript",
-                            course: "MATH 100",
-                            minGrade: "C"
-                        }
-                    ]
+                    type: "transcript",
+                    course: "MATH 100",
+                    minGrade: "C"
                 },
                 {
-                    type: "group",
-                    logic: "ALL_OF",
-                    children: [
-                        {
-                            type: "transcript",
-                            course: "MATH 110",
-                            minGrade: "C"
-                        }
-                    ]
+                    type: "transcript",
+                    course: "MATH 110",
+                    minGrade: "C"
                 }
             ]
         }
     },
 
     "MATH 100": {
-        title: "Pre-Precalculus",
+        title: "Precalculus",
         prerequisites: {
             type: "group",
             logic: "ONE_OF",
