@@ -228,8 +228,8 @@ export default function GraphFunctionalPage() {
 
 	// Layout settings (tweak live via control panel)
 	const [settings, setSettings] = useState({
-		ringBase: 100,      // radius for depth 1 ring offset from center
-		ringStep: 400,      // radius increment per additional depth
+		ringBase: 50,      // radius for depth 1 ring offset from center
+		ringStep: 350,      // radius increment per additional depth
 		iterations: 32,     // relax iterations per layout
 		sepPadding: 16,     // extra spacing added to collision boxes
 		ringSpring: 0.15,   // strength towards ring radius
