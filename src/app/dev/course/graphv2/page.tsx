@@ -28,35 +28,53 @@ type SimLink = {
 	ephemeral?: boolean; // link created by hover
 };
 
-// Parse prerequisiteData into groups of alternatives
-function extractPrereqCourseGroups(id: string): string[][] {
-	const node = prerequisiteData[id];
-	if (!node) return [];
+// Course requirement item extracted from prerequisite tree
+type CourseReq = {
+	id: string;
+	minGrade?: string;
+	canBeTakenConcurrently?: string;
+	orEquivalent?: boolean;
+};
 
-	const walk = (n: PrereqNode): string[][] => {
+// Parse prerequisiteData into groups of alternatives
+function extractPrereqCourseGroups(id: string): CourseReq[][] {
+	const course = prerequisiteData[id];
+	if (!course || !course.prerequisites) return [];
+
+	const walk = (n: PrereqNode): CourseReq[][] => {
 		if (n == null) return [];
 		switch (n.type) {
 			case "transcript":
-				return [[n.course]];
+				return [[{ id: n.course, minGrade: n.minGrade, canBeTakenConcurrently: n.canBeTakenConcurrently, orEquivalent: n.orEquivalent }]];
 			case "creditCount":
 			case "note":
 			case "other":
 				return [];
 			case "group": {
-				const childResults: string[][][] = n.children
+				const childResults: CourseReq[][][] = n.children
 					.map(walk)
-					.filter((r: string[][]) => r.length > 0);
+					.filter((r: CourseReq[][]) => r.length > 0);
 				if (childResults.length === 0) return [];
 
 				if (n.logic === "ONE_OF") {
 					// Merge all alternatives into a single line (union)
-					const set = new Set<string>();
+					const map = new Map<string, CourseReq>();
 					for (const res of childResults) {
 						for (const line of res) {
-							for (const course of line) set.add(course);
+							for (const item of line) {
+								const prior = map.get(item.id);
+								if (!prior) {
+									map.set(item.id, { ...item });
+								} else {
+									// Prefer keeping an existing minGrade; if prior has none, take the new one
+									if (!prior.minGrade && item.minGrade) prior.minGrade = item.minGrade;
+									if (!prior.canBeTakenConcurrently && item.canBeTakenConcurrently) prior.canBeTakenConcurrently = item.canBeTakenConcurrently;
+									if (!prior.orEquivalent && item.orEquivalent) prior.orEquivalent = item.orEquivalent;
+								}
+							}
 						}
 					}
-					return [Array.from(set)];
+					return [[...map.values()].sort((a, b) => a.id.localeCompare(b.id))];
 				} else {
 					// ALL_OF: keep each child's lines separate and concatenate
 					return childResults.flat();
@@ -67,7 +85,16 @@ function extractPrereqCourseGroups(id: string): string[][] {
 		}
 	};
 
-	const result = walk(node).map((line) => Array.from(new Set(line)));
+	const result = walk(course.prerequisites).map((line) => {
+		// De-duplicate within a line by id while favoring entries that include a minGrade
+		const map = new Map<string, CourseReq>();
+		for (const item of line) {
+			const prior = map.get(item.id);
+			if (!prior) map.set(item.id, item);
+			else if (!prior.minGrade && item.minGrade) map.set(item.id, item);
+		}
+		return [...map.values()];
+	});
 	return result;
 }
 
@@ -75,7 +102,7 @@ function extractPrereqCourseGroups(id: string): string[][] {
 function listDirectPrereqCourses(id: string): string[] {
 	const groups = extractPrereqCourseGroups(id);
 	const s = new Set<string>();
-	for (const g of groups) for (const cid of g) s.add(cid);
+	for (const g of groups) for (const item of g) s.add(item.id);
 	return Array.from(s);
 }
 
@@ -85,26 +112,20 @@ function NodeCard({
 	onButtonClick,
 	onButtonHoverIn,
 	onButtonHoverOut,
+	showMinGrade,
 }: {
 	n: SimNode;
 	presentSet: Set<string>;
 	onButtonClick: (parentId: string, courseId: string) => void;
 	onButtonHoverIn: (parentId: string, courseId: string) => void;
 	onButtonHoverOut: (parentId: string, courseId: string) => void;
+	showMinGrade: boolean;
 }) {
 	const groups = useMemo(() => extractPrereqCourseGroups(n.id), [n.id]);
-	const noPrereqs = prerequisiteData[n.id] === null;
-
-	// Special display for ECON 201 per request
-	const isRoot = n.id === "ECON 201";
-	const subtitle = isRoot ? "Intermediate Macroeconomics Theory" : n.subtitle;
-	const rootGroups: string[][] = [
-		["ECON 103", "ECON 113"],
-		["ECON 105", "ECON 115"],
-		["MATH 150", "MATH 151", "MATH 154", "MATH 157"],
-	];
-
-	const displayGroups = isRoot && rootGroups.length ? rootGroups : groups;
+	const course = prerequisiteData[n.id];
+	const missingData = !course;
+	const noPrereqs = !missingData && course?.prerequisites == null;
+	const subtitle = n.subtitle ?? course?.title;
 
 	return (
 		<div
@@ -127,38 +148,38 @@ function NodeCard({
 				) : null}
 			</div>
 			<div className="p-3">
-				{displayGroups.length > 0 ? (
+				{groups.length > 0 ? (
 					<>
 						<div className="text-xs font-medium text-gray-700 mb-1">
 							Prerequisites:
 						</div>
 						<div className="flex flex-col gap-1">
-							{displayGroups.map((alts, i) => (
+							{groups.map((alts, i) => (
 								<div key={i} className="flex flex-wrap items-center gap-1 text-xs">
-									{alts.map((cid, j) => (
-										<React.Fragment key={cid}>
+									{alts.map((req, j) => (
+										<React.Fragment key={req.id}>
 											<button
 												data-pan-block
 												className={
 													"px-2 py-1 rounded border " +
-													(presentSet.has(cid)
+													(presentSet.has(req.id)
 														? "border-blue-500 bg-blue-50 text-blue-700"
 														: "border-gray-300 hover:border-blue-400 hover:bg-blue-50 active:bg-blue-100")
 												}
 												onClick={(e) => {
 													e.stopPropagation();
-													onButtonClick(n.id, cid);
+													onButtonClick(n.id, req.id);
 												}}
 												onMouseEnter={(e) => {
 													e.stopPropagation();
-													onButtonHoverIn(n.id, cid);
+													onButtonHoverIn(n.id, req.id);
 												}}
 												onMouseLeave={(e) => {
 													e.stopPropagation();
-													onButtonHoverOut(n.id, cid);
+													onButtonHoverOut(n.id, req.id);
 												}}
 											>
-												{cid}
+												{showMinGrade && req.minGrade ? `${req.id} (${req.minGrade})` : req.id}
 											</button>
 											{j < alts.length - 1 ? (
 												<span className="text-gray-500">or</span>
@@ -170,7 +191,7 @@ function NodeCard({
 						</div>
 					</>
 					) : (
-						<div className="text-xs text-gray-500">{noPrereqs ? "No prerequisites." : "Error: no prerequisite data found"}</div>
+						<div className="text-xs text-gray-500">{missingData ? "No prerequisite data found." : noPrereqs ? "No prerequisites." : "No prerequisites."}</div>
 				)}
 			</div>
 		</div>
@@ -220,6 +241,7 @@ export default function GraphFunctionalPage() {
 		ringCount: 4,       // number of guide rings to draw
 		useParentAnchors: true, // place deeper rings near parents' angles
 		ringSpacingPad: 16, // extra spacing for same-ring angular separation
+	showMinGrade: false, // render min grade on transcript items
 	});
 
 	// Keep refs in sync
@@ -313,10 +335,11 @@ export default function GraphFunctionalPage() {
 		const rect = containerRef.current.getBoundingClientRect();
 		const cx = rect.width / 2;
 		const cy = rect.height / 2;
+		const rootData = prerequisiteData["ECON 201"];    
 		const root: SimNode = {
 			id: "ECON 201",
 			title: "ECON 201",
-			subtitle: "Intermediate Macroeconomics Theory",
+			subtitle: rootData?.title,
 			persisted: true,
 			pinned: true,
 			width: 320,
@@ -679,26 +702,40 @@ export default function GraphFunctionalPage() {
 			opts: Partial<SimNode> & { persisted?: boolean; anchorParentId?: string }
 		) => {
 			// If a parent is provided, proactively set the child's depth so layout
-			// doesn't treat it as depth 0 for the first frame
+			// doesn't treat it as depth 0 for the first frame. However, do NOT override
+			// depth for already-persisted nodes (hover shouldn't change persisted nodes).
 			if (opts.anchorParentId) {
-				const pd = depthRef.current.get(opts.anchorParentId) ?? 0;
-				const nd = Math.max(1, pd + 1);
-				depthRef.current.set(id, nd);
+				const existing = nodesRef.current.find((n) => n.id === id);
+				const shouldSetDepth = !existing || !existing.persisted;
+				if (shouldSetDepth) {
+					const pd = depthRef.current.get(opts.anchorParentId) ?? 0;
+					const nd = Math.max(1, pd + 1);
+					depthRef.current.set(id, nd);
+				}
 			}
 			setNodes((prev) => {
 				const exists = prev.find((n) => n.id === id);
 				if (exists) {
 					// Update flags
-					const updated = prev.map((n) =>
-						n.id === id
-							? {
-									...n,
-									persisted: opts.persisted ? true : n.persisted,
-									highlight: opts.highlight ?? n.highlight,
-									primaryParentId: opts.anchorParentId ?? n.primaryParentId,
-								}
-							: n
-					);
+					const updated = prev.map((n) => {
+						if (n.id !== id) return n;
+						const wasPersisted = !!n.persisted;
+						const nowPersisted = opts.persisted ? true : n.persisted;
+						// Only allow changing primaryParentId if the node is not yet persisted
+						// (i.e., during hover/creation) or when promoting from ephemeral to persisted.
+						let nextPrimary = n.primaryParentId;
+						if (opts.anchorParentId) {
+							if (!wasPersisted) {
+								nextPrimary = opts.anchorParentId;
+							}
+						}
+						return {
+							...n,
+							persisted: nowPersisted,
+							highlight: opts.highlight ?? n.highlight,
+							primaryParentId: nextPrimary,
+						};
+					});
 					return updated;
 				}
 				const rect = containerRef.current?.getBoundingClientRect();
@@ -751,6 +788,7 @@ export default function GraphFunctionalPage() {
 				const newNode: SimNode = {
 					id,
 					title: id,
+					subtitle: prerequisiteData[id]?.title,
 					persisted: !!opts.persisted,
 					primaryParentId: opts.anchorParentId,
 					width: 300,
@@ -922,28 +960,29 @@ export default function GraphFunctionalPage() {
 	const handleButtonHoverIn = useCallback(
 		(parentId: string, courseId: string) => {
 				// temporarily pin the parent to prevent it moving under the cursor
-				setNodes((prev) =>
-					prev.map((n) =>
-						n.id === parentId
-							? {
-									...n,
-									hoverPinned: true,
-									fx: n.x,
-									fy: n.y,
-								}
-							: n
-					)
-				);
-			// Always highlight the target course on hover; if it exists, just set highlight; else create ephemeral highlighted
 			setNodes((prev) => {
-				const exists = prev.find((p) => p.id === courseId);
+				const updatedNodes = prev.map((n) =>
+					n.id === parentId
+						? {
+								...n,
+								hoverPinned: true,
+								fx: n.x,
+								fy: n.y,
+							}
+						: n
+				);
+				// Always highlight the target course on hover; if it exists, just set highlight; else create ephemeral highlighted
+				const exists = updatedNodes.find((p) => p.id === courseId);
 				if (exists) {
-					return prev.map((p) => (p.id === courseId ? { ...p, highlight: true } : p));
+					// sync ref immediately so render that depends on nodesRef shows the highlight
+					const refNode = nodesRef.current.find((p) => p.id === courseId);
+					if (refNode) refNode.highlight = true;
+					return updatedNodes.map((p) => (p.id === courseId ? { ...p, highlight: true } : p));
 				}
-				return prev;
+				upsertNode(courseId, { persisted: false, highlight: true, anchorParentId: parentId });
+				ensureLink(parentId, courseId, true);
+				return updatedNodes;
 			});
-			upsertNode(courseId, { persisted: false, highlight: true, anchorParentId: parentId });
-			ensureLink(parentId, courseId, true);
 		},
 		[ensureLink, upsertNode]
 	);
@@ -951,21 +990,23 @@ export default function GraphFunctionalPage() {
 	const handleButtonHoverOut = useCallback(
 		(parentId: string, courseId: string) => {
 			// remove highlight
-			setNodes((prev) => prev.map((n) => (n.id === courseId ? { ...n, highlight: false } : n)));
+			setNodes((prev) => {
+				const updatedNodes = prev.map((n) => (n.id === courseId ? { ...n, highlight: false } : n));
+				// sync ref immediately
+				const refNode = nodesRef.current.find((p) => p.id === courseId);
+				if (refNode) refNode.highlight = false;
 				// unpin the parent if it was only hover-pinned (keep static pin for root)
-				setNodes((prev) =>
-					prev.map((n) => {
-						if (n.id !== parentId) return n;
-						const keepStatic = !!n.pinned;
-						return {
-							...n,
-							hoverPinned: false,
-							fx: keepStatic ? n.fx : undefined,
-							fy: keepStatic ? n.fy : undefined,
-						} as SimNode;
-					})
-				);
-			// remove ephemeral link and ephemeral node
+				return updatedNodes.map((n) => {
+					if (n.id !== parentId) return n;
+					const keepStatic = !!n.pinned;
+					return {
+						...n,
+						hoverPinned: false,
+						fx: keepStatic ? n.fx : undefined,
+						fy: keepStatic ? n.fy : undefined,
+					} as SimNode;
+				});
+			});
 			removeEphemeralLink(parentId, courseId);
 			removeNodeIfEphemeral(courseId);
 		},
@@ -1096,6 +1137,11 @@ export default function GraphFunctionalPage() {
 								<span>Anchor deeper rings to parents</span>
 							</label>
 							<label className="flex items-center gap-2">
+								<input type="checkbox" checked={settings.showMinGrade}
+									onChange={(e) => setSettings(s => ({ ...s, showMinGrade: e.target.checked }))} />
+								<span>Show minimum grade</span>
+							</label>
+							<label className="flex items-center gap-2">
 								<input
 									type="checkbox"
 									checked={settings.showRings}
@@ -1174,8 +1220,8 @@ export default function GraphFunctionalPage() {
 					{/* SVG for ring guides and links under nodes */}
 					<svg ref={svgRef} className="absolute inset-0 w-full h-full pointer-events-none" style={{ overflow: 'visible' }}>
 						<defs>
-							<marker id="arrow" viewBox="0 -5 10 10" refX="14" refY="0" markerWidth="6" markerHeight="6" orient="auto">
-								<path d="M0,-5L10,0L0,5" fill="#9CA3AF" />
+							<marker id="arrow" viewBox="0 -5 10 10" refX="6" refY="0" markerWidth="6" markerHeight="6" orient="auto">
+								<path d="M0,-5L10,0L0,5" fill="context-stroke" />
 							</marker>
 						</defs>
 						{settings.showRings ? (
@@ -1215,17 +1261,41 @@ export default function GraphFunctionalPage() {
 								const tid = typeof l.target === "string" ? l.target : l.target.id;
 								const s = getNodePos(sid);
 								const t = getNodePos(tid);
+								// Make non-primary links lighter gray: if child has a primaryParentId and this link's source
+								// isn't that parent, render a lighter stroke color for the link.
+								const childNode = nodesRef.current.find((x) => x.id === tid);
+								const isPrimary = childNode?.primaryParentId === sid;
+								const strokeColor = l.ephemeral
+									? "#BFDBFE" // ephemeral hover link (blue-ish)
+									: isPrimary
+									? "#9CA3AF" // primary link (gray-400)
+									: "#D1D5DB"; // non-primary link (lighter gray-300)
+								// Split into two segments and place arrow at the midpoint so it's not hidden under the node DIVs
+								const mx = (s.x + t.x) / 2;
+								const my = (s.y + t.y) / 2;
+								const strokeW = l.ephemeral ? 1.5 : isPrimary ? 2.5 : 2;
 								return (
-									<line
-										key={i}
-										x1={s.x}
-										y1={s.y}
-										x2={t.x}
-										y2={t.y}
-										stroke={l.ephemeral ? "#BFDBFE" : "#9CA3AF"}
-										strokeWidth={l.ephemeral ? 1.5 : 2}
-										markerEnd="url(#arrow)"
-									/>
+									<g key={i}>
+										<line
+											x1={s.x}
+											y1={s.y}
+											x2={mx}
+											y2={my}
+											stroke={strokeColor}
+											strokeWidth={strokeW}
+											vectorEffect="non-scaling-stroke"
+										/>
+										<line
+											x1={t.x}
+											y1={t.y}
+											x2={mx}
+											y2={my}
+											stroke={strokeColor}
+											strokeWidth={strokeW}
+											vectorEffect="non-scaling-stroke"
+											markerEnd="url(#arrow)"
+										/>
+									</g>
 								);
 							})}
 						</g>
@@ -1249,6 +1319,7 @@ export default function GraphFunctionalPage() {
 								onButtonClick={handleButtonClick}
 								onButtonHoverIn={handleButtonHoverIn}
 								onButtonHoverOut={handleButtonHoverOut}
+								showMinGrade={settings.showMinGrade}
 							/>
 						</div>
 					))}
