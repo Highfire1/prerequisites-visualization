@@ -1151,7 +1151,7 @@ export default function GraphFunctionalPage() {
 					{/* Root selector (top-left) */}
 					<div data-pan-block className="absolute top-2 left-2 z-20 bg-white/90 backdrop-blur rounded-lg border border-gray-200 shadow p-2 text-xs text-gray-800">
 						<label className="flex items-center gap-2">
-							<span className="text-gray-700">Root</span>
+							{/* <span className="text-gray-700">Root</span> */}
 							<select
 								className="border border-gray-300 rounded px-1 py-0.5 bg-white"
 								value={rootId}
