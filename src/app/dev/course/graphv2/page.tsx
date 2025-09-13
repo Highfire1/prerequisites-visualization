@@ -1143,10 +1143,10 @@ export default function GraphFunctionalPage() {
 	const presentSet = useMemo(() => new Set(nodes.map((n) => n.id)), [nodes]);
 
 	return (
-		<div className="w-full h-[calc(100vh-2rem)] p-4">
+		<div className="w-full h-[100vh]">
 			<div
 				ref={containerRef}
-				className={`relative w-full h-full bg-gray-50 border border-gray-200 rounded-lg overflow-hidden ${isPanning ? 'cursor-grabbing' : 'cursor-grab'}`}
+				className={`relative w-full h-full bg-gray-50 border border-gray-200 overflow-hidden ${isPanning ? 'cursor-grabbing' : 'cursor-grab'}`}
 			>
 					{/* Root selector (top-left) */}
 					<div data-pan-block className="absolute top-2 left-2 z-20 bg-white/90 backdrop-blur rounded-lg border border-gray-200 shadow p-2 text-xs text-gray-800">
