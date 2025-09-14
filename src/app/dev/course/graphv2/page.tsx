@@ -276,29 +276,76 @@ export default function GraphFunctionalPage() {
 	const svgRef = useRef<SVGSVGElement>(null);
 	const depthRef = useRef<Map<string, number>>(new Map());
 
-	// Prevent vertical scroll on mobile while dragging the graph
+
+
+	// Touch: single-finger pan, two-finger pinch zoom (must be after view state is declared)
 	useEffect(() => {
 		const container = containerRef.current;
 		if (!container) return;
-		let active = false;
+		let panActive = false;
+		let pinchActive = false;
 		let lastX = 0, lastY = 0;
+		let lastDist = 0;
+		let lastMid = { x: 0, y: 0 };
+		let startView = { x: 0, y: 0, k: 1 };
+
+		const getTouchMid = (t1: Touch, t2: Touch) => ({
+			x: (t1.clientX + t2.clientX) / 2,
+			y: (t1.clientY + t2.clientY) / 2,
+		});
+		const getTouchDist = (t1: Touch, t2: Touch) => {
+			const dx = t1.clientX - t2.clientX;
+			const dy = t1.clientY - t2.clientY;
+			return Math.sqrt(dx * dx + dy * dy);
+		};
+
 		const onTouchStart = (e: TouchEvent) => {
 			if (e.touches.length === 1) {
 				lastX = e.touches[0].clientX;
 				lastY = e.touches[0].clientY;
-				active = true;
+				panActive = true;
+			} else if (e.touches.length === 2) {
+				pinchActive = true;
+				panActive = false;
+				lastDist = getTouchDist(e.touches[0], e.touches[1]);
+				lastMid = getTouchMid(e.touches[0], e.touches[1]);
+				startView = { ...view };
 			}
 		};
 		const onTouchMove = (e: TouchEvent) => {
-			if (!active) return;
-			const dx = Math.abs(e.touches[0].clientX - lastX);
-			const dy = Math.abs(e.touches[0].clientY - lastY);
-			// Only preventDefault if the user is dragging horizontally or vertically (not just tapping)
-			if (dx > 2 || dy > 2) {
+			if (pinchActive && e.touches.length === 2) {
 				e.preventDefault();
+				const dist = getTouchDist(e.touches[0], e.touches[1]);
+				const mid = getTouchMid(e.touches[0], e.touches[1]);
+				const scale = dist / lastDist;
+				const newK = Math.max(0.2, Math.min(4, startView.k * scale));
+				// Pan so that the midpoint stays under the same screen point
+				const dx = (mid.x - lastMid.x) / newK;
+				const dy = (mid.y - lastMid.y) / newK;
+				setView({
+					x: startView.x + dx,
+					y: startView.y + dy,
+					k: newK,
+				});
+			} else if (panActive && e.touches.length === 1) {
+				const dx = e.touches[0].clientX - lastX;
+				const dy = e.touches[0].clientY - lastY;
+				if (Math.abs(dx) > 2 || Math.abs(dy) > 2) {
+					e.preventDefault();
+				}
 			}
 		};
-		const onTouchEnd = () => { active = false; };
+		const onTouchEnd = (e: TouchEvent) => {
+			if (e.touches.length === 0) {
+				panActive = false;
+				pinchActive = false;
+			} else if (e.touches.length === 1) {
+				pinchActive = false;
+				panActive = true;
+				lastX = e.touches[0].clientX;
+				lastY = e.touches[0].clientY;
+			}
+		};
 		container.addEventListener("touchstart", onTouchStart, { passive: false });
 		container.addEventListener("touchmove", onTouchMove, { passive: false });
 		container.addEventListener("touchend", onTouchEnd);
@@ -307,7 +354,7 @@ export default function GraphFunctionalPage() {
 			container.removeEventListener("touchmove", onTouchMove);
 			container.removeEventListener("touchend", onTouchEnd);
 		};
-	}, []);
+	}, [view]);
 
 	// Dynamic root id (default ECON 201)
 	const [rootId, setRootId] = useState<string>("ECON 201");
