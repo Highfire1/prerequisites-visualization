@@ -276,6 +276,39 @@ export default function GraphFunctionalPage() {
 	const svgRef = useRef<SVGSVGElement>(null);
 	const depthRef = useRef<Map<string, number>>(new Map());
 
+	// Prevent vertical scroll on mobile while dragging the graph
+	useEffect(() => {
+		const container = containerRef.current;
+		if (!container) return;
+		let active = false;
+		let lastX = 0, lastY = 0;
+		const onTouchStart = (e: TouchEvent) => {
+			if (e.touches.length === 1) {
+				lastX = e.touches[0].clientX;
+				lastY = e.touches[0].clientY;
+				active = true;
+			}
+		};
+		const onTouchMove = (e: TouchEvent) => {
+			if (!active) return;
+			const dx = Math.abs(e.touches[0].clientX - lastX);
+			const dy = Math.abs(e.touches[0].clientY - lastY);
+			// Only preventDefault if the user is dragging horizontally or vertically (not just tapping)
+			if (dx > 2 || dy > 2) {
+				e.preventDefault();
+			}
+		};
+		const onTouchEnd = () => { active = false; };
+		container.addEventListener("touchstart", onTouchStart, { passive: false });
+		container.addEventListener("touchmove", onTouchMove, { passive: false });
+		container.addEventListener("touchend", onTouchEnd);
+		return () => {
+			container.removeEventListener("touchstart", onTouchStart);
+			container.removeEventListener("touchmove", onTouchMove);
+			container.removeEventListener("touchend", onTouchEnd);
+		};
+	}, []);
+
 	// Dynamic root id (default ECON 201)
 	const [rootId, setRootId] = useState<string>("ECON 201");
 
@@ -1164,7 +1197,7 @@ export default function GraphFunctionalPage() {
 						</label>
 					</div>
 					{/* Controls */}
-					<div data-pan-block className="absolute top-2 right-2 z-20 w-72 bg-white/90 backdrop-blur rounded-lg border border-gray-200 shadow p-3 text-xs text-gray-800">
+					<div data-pan-block className="absolute top-2 right-2 z-20 w-72 hidden md:block bg-white/90 backdrop-blur rounded-lg border border-gray-200 shadow p-3 text-xs text-gray-800">
 						<div className="font-medium text-gray-700 mb-2">Layout controls</div>
 						<div className="space-y-2">
 							<label className="flex items-center justify-between gap-2">
