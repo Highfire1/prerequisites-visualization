@@ -278,7 +278,26 @@ export default function GraphFunctionalPage() {
 
 
 
-	// Touch: single-finger pan, two-finger pinch zoom (must be after view state is declared)
+	// Dynamic root id (default ECON 201)
+	const [rootId, setRootId] = useState<string>("ECON 201");
+
+	const [nodes, setNodes] = useState<SimNode[]>([]);
+	const [links, setLinks] = useState<SimLink[]>([]);
+	const nodesRef = useRef<SimNode[]>(nodes);
+	const linksRef = useRef<SimLink[]>(links);
+		const [, forceRender] = useState({});
+
+	// Remember which children were open when a coursecard was closed,
+	// so we can reopen them if that course is reopened later
+	const [reopenMemory, setReopenMemory] = useState<Map<string, Set<string>>>(new Map());
+	const reopenMemoryRef = useRef(reopenMemory);
+	useEffect(() => void (reopenMemoryRef.current = reopenMemory), [reopenMemory]);
+
+	// View transform (pan/zoom)
+	const [view, setView] = useState({ x: 0, y: 0, k: 1 });
+	const viewRef = useRef(view);
+	useEffect(() => void (viewRef.current = view), [view]);
+	// Touch: single-finger pan, two-finger pinch zoom
 	useEffect(() => {
 		const container = containerRef.current;
 		if (!container) return;
@@ -309,7 +328,7 @@ export default function GraphFunctionalPage() {
 				panActive = false;
 				lastDist = getTouchDist(e.touches[0], e.touches[1]);
 				lastMid = getTouchMid(e.touches[0], e.touches[1]);
-				startView = { ...view };
+				startView = { ...viewRef.current };
 			}
 		};
 		const onTouchMove = (e: TouchEvent) => {
@@ -354,27 +373,7 @@ export default function GraphFunctionalPage() {
 			container.removeEventListener("touchmove", onTouchMove);
 			container.removeEventListener("touchend", onTouchEnd);
 		};
-	}, [view]);
-
-	// Dynamic root id (default ECON 201)
-	const [rootId, setRootId] = useState<string>("ECON 201");
-
-	const [nodes, setNodes] = useState<SimNode[]>([]);
-	const [links, setLinks] = useState<SimLink[]>([]);
-	const nodesRef = useRef<SimNode[]>(nodes);
-	const linksRef = useRef<SimLink[]>(links);
-		const [, forceRender] = useState({});
-
-	// Remember which children were open when a coursecard was closed,
-	// so we can reopen them if that course is reopened later
-	const [reopenMemory, setReopenMemory] = useState<Map<string, Set<string>>>(new Map());
-	const reopenMemoryRef = useRef(reopenMemory);
-	useEffect(() => void (reopenMemoryRef.current = reopenMemory), [reopenMemory]);
-
-	// View transform (pan/zoom)
-	const [view, setView] = useState({ x: 0, y: 0, k: 1 });
-	const viewRef = useRef(view);
-	useEffect(() => void (viewRef.current = view), [view]);
+	}, []);
 	const [isPanning, setIsPanning] = useState(false);
 	// Stable drag state (avoid effect rebinds mid-drag)
 	const draggingRef = useRef(false);
