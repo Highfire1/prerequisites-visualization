@@ -305,13 +305,14 @@ export default function GraphFunctionalPage() {
 		let pinchActive = false;
 		let lastX = 0, lastY = 0;
 		let lastDist = 0;
-		let lastMid = { x: 0, y: 0 };
-		let startView = { x: 0, y: 0, k: 1 };
 
-		const getTouchMid = (t1: Touch, t2: Touch) => ({
-			x: (t1.clientX + t2.clientX) / 2,
-			y: (t1.clientY + t2.clientY) / 2,
-		});
+		const getTouchMid = (t1: Touch, t2: Touch) => {
+			const rect = container.getBoundingClientRect();
+			return {
+				x: (t1.clientX + t2.clientX) / 2 - rect.left,
+				y: (t1.clientY + t2.clientY) / 2 - rect.top,
+			};
+		};
 		const getTouchDist = (t1: Touch, t2: Touch) => {
 			const dx = t1.clientX - t2.clientX;
 			const dy = t1.clientY - t2.clientY;
@@ -327,25 +328,28 @@ export default function GraphFunctionalPage() {
 				pinchActive = true;
 				panActive = false;
 				lastDist = getTouchDist(e.touches[0], e.touches[1]);
-				lastMid = getTouchMid(e.touches[0], e.touches[1]);
-				startView = { ...viewRef.current };
 			}
 		};
 		const onTouchMove = (e: TouchEvent) => {
 			if (pinchActive && e.touches.length === 2) {
 				e.preventDefault();
 				const dist = getTouchDist(e.touches[0], e.touches[1]);
-				const mid = getTouchMid(e.touches[0], e.touches[1]);
-				const scale = dist / lastDist;
-				const newK = Math.max(0.2, Math.min(4, startView.k * scale));
-				// Pan so that the midpoint stays under the same screen point
-				const dx = (mid.x - lastMid.x) / newK;
-				const dy = (mid.y - lastMid.y) / newK;
-				setView({
-					x: startView.x + dx,
-					y: startView.y + dy,
-					k: newK,
-				});
+				if (lastDist === 0) {
+					lastDist = dist;
+					return;
+				}
+				const mid = getTouchMid(e.touches[0], e.touches[1]); // container-relative
+				const { x, y, k } = viewRef.current;
+				const scaleDelta = dist / lastDist;
+				const unclampedK = k * scaleDelta;
+				const newK = Math.max(0.3, Math.min(3.0, unclampedK));
+				// Keep the world point under the current midpoint stationary while scaling
+				const worldX = (mid.x - x) / k;
+				const worldY = (mid.y - y) / k;
+				const newX = mid.x - worldX * newK;
+				const newY = mid.y - worldY * newK;
+				setView({ x: newX, y: newY, k: newK });
+				lastDist = dist;
 			} else if (panActive && e.touches.length === 1) {
 				const dx = e.touches[0].clientX - lastX;
 				const dy = e.touches[0].clientY - lastY;
