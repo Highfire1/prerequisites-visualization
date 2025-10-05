@@ -2,10 +2,10 @@ import CourseGraph from './CourseGraph';
 import { getAllCourses, getCourseByDeptAndNumber } from '../../../../../utils/courseApi';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     dept: string;
     number: string;
-  };
+  }>;
 }
 
 // Generate static paths for all courses from API
