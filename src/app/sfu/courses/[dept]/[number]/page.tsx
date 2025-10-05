@@ -12,10 +12,12 @@ interface PageProps {
 export async function generateStaticParams() {
   try {
     const courses = await getAllCourses();
-    return courses.map((course) => ({
-      dept: course.dept,
-      number: course.number,
+    const params = courses.map((course) => ({
+      dept: String(course.dept).toLowerCase(),
+      number: String(course.number),
     }));
+    console.log(`Generated ${params.length} static params for courses`);
+    return params;
   } catch (error) {
     console.error('Error generating static params:', error);
     return [];

@@ -431,6 +431,7 @@ export default function CourseGraph({ courseId: initialCourseId, courses }: Cour
 		};
 	}, []);
 	const [isPanning, setIsPanning] = useState(false);
+	const [showSettings, setShowSettings] = useState(false);
 	// Stable drag state (avoid effect rebinds mid-drag)
 	const draggingRef = useRef(false);
 	const movedRef = useRef(false);
@@ -1284,9 +1285,30 @@ export default function CourseGraph({ courseId: initialCourseId, courses }: Cour
 				ref={containerRef}
 				className={`relative w-full h-full bg-white dark:bg-neutral-900 border border-gray-200 dark:border-gray-700 overflow-hidden ${isPanning ? 'cursor-grabbing' : 'cursor-grab'}`}
 			>
-					{/* Controls */}
-					<div data-pan-block className="absolute top-2 right-2 z-20 w-72 hidden md:block bg-white/90 dark:bg-neutral-800/90 backdrop-blur rounded-lg border border-gray-200 dark:border-gray-700 shadow p-3 text-xs text-gray-800 dark:text-gray-200">
-						<div className="font-medium text-gray-700 dark:text-gray-300 mb-2">Layout controls</div>
+					{/* Fullscreen button - top right */}
+					<div data-pan-block className="absolute top-2 right-2 z-20">
+						<button
+							className="bg-white/90 dark:bg-neutral-800/90 backdrop-blur rounded-lg border border-gray-200 dark:border-gray-700 shadow px-3 py-2 text-xs hover:bg-neutral-50 dark:hover:bg-neutral-700"
+							onClick={() => {
+								if (!document.fullscreenElement) {
+									containerRef.current?.requestFullscreen();
+								} else {
+									document.exitFullscreen();
+								}
+							}}
+							title="Toggle fullscreen"
+						>
+							<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+							</svg>
+						</button>
+					</div>
+
+					{/* Settings panel - bottom left with toggle */}
+					<div data-pan-block className="absolute bottom-3 left-3 z-20 flex flex-col items-start gap-2">
+						{showSettings && (
+							<div className="w-72 bg-white/90 dark:bg-neutral-800/90 backdrop-blur rounded-lg border border-gray-200 dark:border-gray-700 shadow p-3 text-xs text-gray-800 dark:text-gray-200">
+								<div className="font-medium text-gray-700 dark:text-gray-300 mb-2">Layout controls</div>
 						<div className="space-y-2">
 							<label className="flex items-center justify-between gap-2">
 								<span>Ring base</span>
@@ -1379,6 +1401,19 @@ export default function CourseGraph({ courseId: initialCourseId, courses }: Cour
 								</button>
 							</div>
 						</div>
+						</div>
+						)}
+						<button
+							className="bg-white/90 dark:bg-neutral-800/90 backdrop-blur rounded-lg border border-gray-200 dark:border-gray-700 shadow px-3 py-2 text-xs hover:bg-neutral-50 dark:hover:bg-neutral-700 flex items-center gap-2"
+							onClick={() => setShowSettings(!showSettings)}
+							title="Toggle settings"
+						>
+							<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+							</svg>
+							{showSettings ? 'Hide' : 'Show'} Settings
+						</button>
 					</div>
 
 					{/* Bottom-right map controls */}
