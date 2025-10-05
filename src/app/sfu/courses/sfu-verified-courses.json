@@ -1,0 +1,268 @@
+{
+  "metadata": {
+    "title": "SFU Verified Course Prerequisites Export",
+    "description": "This file contains all courses that have been human-verified through the crowdsourcing system. Each course includes the original prerequisite text and the parsed/structured prerequisite data.",
+    "exportDate": "2025-10-05T00:33:10.059Z",
+    "totalCourses": 8,
+    "fields": {
+      "id": "Unique course identifier",
+      "dept": "Department code (e.g., CMPT, MATH)",
+      "number": "Course number (e.g., 101, 215)",
+      "title": "Course title",
+      "description": "Course description",
+      "prerequisites": "Original prerequisite text from course catalog",
+      "corequisites": "Original corequisite text from course catalog",
+      "notes": "Additional course notes from catalog",
+      "parse_status": "Current parsing status (should be 'human_verified' for all entries)",
+      "parsed_prerequisites": "Structured prerequisite data (JSON object) - the verified parsed requirements",
+      "parsed_credit_conflicts": "Credit exclusion data (JSON object) - courses that conflict with this one",
+      "verified_at": "Timestamp when the course was verified (from verification table)"
+    },
+    "note": "The parsed_prerequisites field contains structured data representing course requirements. This data has been verified by human reviewers for accuracy."
+  },
+  "courses": [
+    {
+      "id": 11327,
+      "dept": "ACMA",
+      "number": "231",
+      "title": "Tools for Data-Driven Decision Making",
+      "description": "Introduction to key analytical tools used to organize and process data to support decision making.",
+      "prerequisites": "BC Mathematics 12 (or equivalent) or any 100-level MATH course with a minimum grade of C.",
+      "corequisites": "",
+      "notes": "",
+      "parse_status": "human_verified",
+      "parsed_prerequisites": {
+        "type": "group",
+        "logic": "ONE_OF",
+        "children": [
+          {
+            "type": "HSCourse",
+            "course": "BC Mathematics 12",
+            "orEquivalent": "true"
+          },
+          {
+            "type": "courseCount",
+            "count": 1,
+            "level": "1XX",
+            "minGrade": "C",
+            "department": "MATH"
+          }
+        ]
+      },
+      "parsed_credit_conflicts": null,
+      "verified_at": "2025-10-03T09:03:18.499443+00:00"
+    },
+    {
+      "id": 11331,
+      "dept": "ACMA",
+      "number": "337",
+      "title": "Job Practicum II",
+      "description": "Second term of work experience in a co-operative education program available to actuarial students. Units from this course do not count towards the units required for an SFU degree. Grading is on a pass/withdraw basis. A course fee is required.",
+      "prerequisites": "ACMA 336 or Job Practicum I from another department. Students must apply and receive permission from the co-op coordinator at least one term in advance.",
+      "corequisites": "",
+      "notes": "",
+      "parse_status": "human_verified",
+      "parsed_prerequisites": {
+        "type": "group",
+        "logic": "ALL_OF",
+        "children": [
+          {
+            "type": "group",
+            "logic": "ONE_OF",
+            "children": [
+              {
+                "type": "course",
+                "number": "336",
+                "department": "ACMA"
+              },
+              {
+                "note": "Job Practicum I from another department",
+                "type": "other"
+              }
+            ]
+          },
+          {
+            "note": "Students must apply and receive permission from the co-op coordinator at least one term in advance.",
+            "type": "permission"
+          }
+        ]
+      },
+      "parsed_credit_conflicts": null,
+      "verified_at": "2025-10-03T04:16:04.08969+00:00"
+    },
+    {
+      "id": 11337,
+      "dept": "ACMA",
+      "number": "437",
+      "title": "Job Practicum IV",
+      "description": "Fourth term of work experience in a co-operative education program available to actuarial students. Units from this course do not count towards the units required for an SFU degree. Grading is on a pass/withdraw basis. A course fee is required.",
+      "prerequisites": "ACMA 436 or Job Practicum III from another department. Students must apply and receive permission from the co-op coordinator at least one term in advance.",
+      "corequisites": "",
+      "notes": "",
+      "parse_status": "human_verified",
+      "parsed_prerequisites": {
+        "type": "group",
+        "logic": "ALL_OF",
+        "children": [
+          {
+            "type": "group",
+            "logic": "ONE_OF",
+            "children": [
+              {
+                "type": "course",
+                "number": "436",
+                "department": "ACMA"
+              },
+              {
+                "note": "Job Practicum III from another department",
+                "type": "other"
+              }
+            ]
+          },
+          {
+            "note": "Students must apply and receive permission from the co-op coordinator at least one term in advance.",
+            "type": "permission"
+          }
+        ]
+      },
+      "parsed_credit_conflicts": null,
+      "verified_at": "2025-10-03T04:16:28.651341+00:00"
+    },
+    {
+      "id": 11338,
+      "dept": "ACMA",
+      "number": "438",
+      "title": "Job Practicum V",
+      "description": "Optional fifth term of work experience in a co-operative education program available to actuarial students. Units from this course do not count towards the units required for an SFU degree. Grading is on a pass/withdraw basis. A course fee is required. This course may be repeated for additive credit.",
+      "prerequisites": "ACMA 437 or Job Practicum IV from another department. Students must apply and receive permission from the co-op coordinator at least one term in advance.",
+      "corequisites": "",
+      "notes": "",
+      "parse_status": "human_verified",
+      "parsed_prerequisites": {
+        "type": "group",
+        "logic": "ALL_OF",
+        "children": [
+          {
+            "type": "group",
+            "logic": "ONE_OF",
+            "children": [
+              {
+                "type": "course",
+                "number": "437",
+                "department": "ACMA"
+              },
+              {
+                "note": "Job Practicum IV from another department",
+                "type": "other"
+              }
+            ]
+          },
+          {
+            "note": "Students must apply and receive permission from the co-op coordinator at least one term in advance.",
+            "type": "permission"
+          }
+        ]
+      },
+      "parsed_credit_conflicts": null,
+      "verified_at": "2025-10-03T09:03:40.02757+00:00"
+    },
+    {
+      "id": 11339,
+      "dept": "ACMA",
+      "number": "455",
+      "title": "Loss Models II",
+      "description": "Aggregate loss models. Credibility: models and estimation. Insurance and reinsurance coverages. Pricing and reserving for short-term insurance coverages. Covers part of the syllabus for Exam STAM of the Society of Actuaries.",
+      "prerequisites": "ACMA 355 with a minimum grade of C.",
+      "corequisites": "",
+      "notes": "",
+      "parse_status": "human_verified",
+      "parsed_prerequisites": {
+        "type": "course",
+        "number": "355",
+        "minGrade": "C",
+        "department": "ACMA"
+      },
+      "parsed_credit_conflicts": null,
+      "verified_at": "2025-10-03T04:16:35.865086+00:00"
+    },
+    {
+      "id": 11341,
+      "dept": "ACMA",
+      "number": "495",
+      "title": "Directed Studies in Actuarial Science",
+      "description": "Independent study and/or research in topics chosen in consultation with the supervising instructor. ",
+      "prerequisites": "Written permission from the Department of Statistics and Actuarial Science undergraduate curriculum committee.",
+      "corequisites": "",
+      "notes": "",
+      "parse_status": "human_verified",
+      "parsed_prerequisites": {
+        "note": "Written permission from the Department of Statistics and Actuarial Science undergraduate curriculum committee.",
+        "type": "permission"
+      },
+      "parsed_credit_conflicts": null,
+      "verified_at": "2025-10-03T09:03:52.673399+00:00"
+    },
+    {
+      "id": 10766,
+      "dept": "POL",
+      "number": "222",
+      "title": "Introduction to Canadian Politics",
+      "description": "An introduction to the social and participatory basis of Canadian politics, covering topics such as political culture, regionalism and other political divisions, political parties, elections, interest groups and new social movements.",
+      "prerequisites": "POL 100 or 151 or permission of department.",
+      "corequisites": "",
+      "notes": "",
+      "parse_status": "human_verified",
+      "parsed_prerequisites": {
+        "type": "group",
+        "logic": "ONE_OF",
+        "children": [
+          {
+            "type": "course",
+            "number": "100",
+            "department": "POL"
+          },
+          {
+            "type": "course",
+            "number": "151",
+            "department": "POL"
+          },
+          {
+            "note": "Permission of Department",
+            "type": "permission"
+          }
+        ]
+      },
+      "parsed_credit_conflicts": null,
+      "verified_at": "2025-10-03T09:05:26.904471+00:00"
+    },
+    {
+      "id": 10780,
+      "dept": "POL",
+      "number": "346",
+      "title": "International Organization",
+      "description": "An examination of the structures and processes and the main substantive decisions of the United Nations and related international organizations. Based upon in-depth study of the UN Charter, the Security Council, General Assembly, Secretary-general and Secretariat and their constitutional and political interactions since 1945, with special attention to the theory and practice of international organization advanced by the principal Western countries, the Soviet Union and Soviet bloc, the People's Republic of China and leading Third World countries.",
+      "prerequisites": "Six lower division units in political science or permission of the department.",
+      "corequisites": "",
+      "notes": "",
+      "parse_status": "human_verified",
+      "parsed_prerequisites": {
+        "type": "group",
+        "logic": "ONE_OF",
+        "children": [
+          {
+            "type": "creditCount",
+            "level": "LD",
+            "credits": 6,
+            "department": "POL"
+          },
+          {
+            "note": "Permission of the department",
+            "type": "permission"
+          }
+        ]
+      },
+      "parsed_credit_conflicts": null,
+      "verified_at": "2025-10-03T09:06:01.460156+00:00"
+    }
+  ]
+}

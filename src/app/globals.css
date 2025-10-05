@@ -47,3 +47,26 @@ body {
   display: block !important;
 }
 
+/* React Flow tweaks for readability */
+.react-flow__node {
+  color: #0f172a; /* slate-900 */
+}
+.dark .react-flow__node {
+  color: #e2e8f0; /* slate-200 */
+}
+.react-flow__edge-textbg {
+  fill: rgba(255,255,255,0.85);
+}
+.dark .react-flow__edge-textbg {
+  fill: rgba(15,23,42,0.85); /* slate-900 */
+}
+.react-flow__edge-text {
+  fill: #0f172a; /* slate-900 */
+}
+.dark .react-flow__edge-text {
+  fill: #e2e8f0; /* slate-200 */
+}
+.react-flow__attribution {
+  display: none;
+}
+
