@@ -4,6 +4,10 @@
 #
 name: Deploy Next.js site to Pages
 
+env:
+  CROWDSOURCE_API_KEY: ${{ secrets.CROWDSOURCE_API_KEYCROWDSOURCE_API_KEY` with the required value.
+
+
 on:
   # Runs on pushes targeting the default branch
   push:
