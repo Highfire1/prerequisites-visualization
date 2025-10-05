@@ -1,25 +1,9 @@
-"use client";
-
 import Link from 'next/link';
-import sfuCoursesData from './sfu-verified-courses.json';
+import { getCourseData, type Course } from '../../../utils/courseApi';
 
-type Course = {
-  id: number;
-  dept: string;
-  number: string;
-  title: string;
-  description: string;
-  prerequisites: string;
-  corequisites: string;
-  notes: string;
-  parse_status: string;
-  parsed_prerequisites: Record<string, unknown> | null;
-  parsed_credit_conflicts: Record<string, unknown> | null;
-  verified_at: string;
-};
-
-export default function SFUCoursesPage() {
-  const courses: Course[] = sfuCoursesData.courses;
+export default async function SFUCoursesPage() {
+  const data = await getCourseData();
+  const courses: Course[] = data.courses;
 
   // Group courses by department
   const coursesByDept = courses.reduce((acc, course) => {
@@ -79,7 +63,7 @@ export default function SFUCoursesPage() {
         </div>
 
         <div className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
-          Data last updated: {new Date(sfuCoursesData.metadata.exportDate).toLocaleDateString()}
+          Data last updated: {data.metadata?.exportDate ? new Date(data.metadata.exportDate).toLocaleDateString() : 'Unknown'}
         </div>
       </div>
     </div>

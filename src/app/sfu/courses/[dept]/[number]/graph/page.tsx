@@ -1,20 +1,5 @@
 import CourseGraph from '../CourseGraph';
-import sfuCoursesData from '../../../sfu-verified-courses.json';
-
-type Course = {
-  id: number;
-  dept: string;
-  number: string;
-  title: string;
-  description: string;
-  prerequisites: string;
-  corequisites: string;
-  notes: string;
-  parse_status: string;
-  parsed_prerequisites: Record<string, unknown> | null;
-  parsed_credit_conflicts: Record<string, unknown> | null;
-  verified_at: string;
-};
+import { getAllCourses, getCourseByDeptAndNumber, type Course } from '../../../../../../utils/courseApi';
 
 interface PageProps {
   params: {
@@ -23,21 +8,29 @@ interface PageProps {
   };
 }
 
-// Generate static paths for all courses in the JSON data
+// Generate static paths for all courses from API
 export async function generateStaticParams() {
-  return sfuCoursesData.courses.map((course: Course) => ({
-    dept: course.dept,
-    number: course.number,
-  }));
+  try {
+    const courses = await getAllCourses();
+    return courses.map((course: Course) => ({
+      dept: course.dept,
+      number: course.number,
+    }));
+  } catch (error) {
+    console.error('Error generating static params:', error);
+    return [];
+  }
 }
 
-export default function GraphPage({ params }: PageProps) {
-  const courseId = `${params.dept.toUpperCase()} ${params.number}`;
+export default async function GraphPage({ params }: PageProps) {
+  const resolvedParams = await params;
+  const courseId = `${resolvedParams.dept.toUpperCase()} ${resolvedParams.number}`;
   
-  // Find the course in our data
-  const course = sfuCoursesData.courses.find(
-    (c: Course) => c.dept === params.dept.toUpperCase() && c.number === params.number
-  );
+  // Fetch the course and all courses from API at build time
+  const [course, allCourses] = await Promise.all([
+    getCourseByDeptAndNumber(resolvedParams.dept, resolvedParams.number),
+    getAllCourses()
+  ]);
 
   if (!course) {
     return (
@@ -67,7 +60,7 @@ export default function GraphPage({ params }: PageProps) {
 
   return (
     <div className="w-full h-screen bg-white dark:bg-black">
-      <CourseGraph courseId={courseId} />
+      <CourseGraph courseId={courseId} courses={allCourses} />
     </div>
   );
 }
