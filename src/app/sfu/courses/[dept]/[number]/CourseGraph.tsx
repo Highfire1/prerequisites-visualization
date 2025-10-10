@@ -304,7 +304,25 @@ function NodeCard({
 						<div className="flex flex-col gap-1 text-xs">{renderNode(course.parsed_prerequisites as SFUPrereqNode)}</div>
 					</>
 					) : (
-						<div className="text-xs text-gray-500 dark:text-gray-400">{missingData ? "No prerequisite data found." : noPrereqs ? "No prerequisites." : "No prerequisites."}</div>
+						<div className="text-xs text-gray-500 dark:text-gray-400">
+							{missingData ? (
+								<>
+									This course hasn&apos;t been parsed yet. Contribute today at{" "}
+									<a
+										href="https://crowdsource.sfucourses.com"
+										className="underline hover:opacity-80"
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										crowdsource.sfucourses.com
+									</a>
+								</>
+							) : noPrereqs ? (
+								"No prerequisites."
+							) : (
+								"No prerequisites."
+							)}
+						</div>
 				)}
 			</div>
 		</div>
