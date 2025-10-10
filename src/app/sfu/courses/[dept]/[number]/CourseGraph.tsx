@@ -161,9 +161,9 @@ function NodeCard({
 			data-pan-block
 			className={
 				"px-2 py-1 rounded border " +
-				(presentSet.has(id)
-					? "border-gray-900 dark:border-gray-100 bg-neutral-100 dark:bg-neutral-800 text-gray-900 dark:text-gray-100"
-					: "border-gray-300 dark:border-gray-600 hover:border-gray-600 dark:hover:border-gray-400 hover:bg-neutral-50 dark:hover:bg-neutral-800 active:bg-neutral-100 dark:active:bg-neutral-700")
+					(presentSet.has(id)
+						? "border-gray-900 dark:border-gray-100 bg-neutral-100 dark:bg-neutral-800 text-gray-900 dark:text-gray-100"
+						: "border-gray-300 dark:border-gray-600 hover:border-gray-600 dark:hover:border-gray-400 hover:bg-neutral-50 dark:hover:bg-neutral-800 active:bg-neutral-100 dark:active:bg-neutral-700")
 			}
 			onClick={(e) => {
 				e.stopPropagation();
@@ -1285,10 +1285,24 @@ export default function CourseGraph({ courseId: initialCourseId, courses }: Cour
 				ref={containerRef}
 				className={`relative w-full h-full bg-white dark:bg-neutral-900 border border-gray-200 dark:border-gray-700 overflow-hidden ${isPanning ? 'cursor-grabbing' : 'cursor-grab'}`}
 			>
+				{/* Home button - top left */}
+				<div data-pan-block className="absolute top-2 left-2 z-20">
+					<a
+						href="/sfu"
+						className="inline-flex items-center gap-2 bg-white/90 dark:bg-neutral-800/90 backdrop-blur rounded-lg border border-gray-200 dark:border-gray-700 shadow px-3 py-2 text-xs hover:bg-neutral-50 dark:hover:bg-neutral-700 text-gray-800 dark:text-gray-200"
+						title="Home"
+					>
+						<svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+							<path d="M3 10.5L12 3l9 7.5" />
+							<path d="M5 10v9a1 1 0 001 1h4v-6h4v6h4a1 1 0 001-1v-9" />
+						</svg>
+						<span className="hidden sm:inline">Home</span>
+					</a>
+				</div>
 					{/* Fullscreen button - top right */}
 					<div data-pan-block className="absolute top-2 right-2 z-20">
 						<button
-							className="bg-white/90 dark:bg-neutral-800/90 backdrop-blur rounded-lg border border-gray-200 dark:border-gray-700 shadow px-3 py-2 text-xs hover:bg-neutral-50 dark:hover:bg-neutral-700"
+							className="inline-flex items-center gap-2 bg-white/90 dark:bg-neutral-800/90 backdrop-blur rounded-lg border border-gray-200 dark:border-gray-700 shadow px-3 py-2 text-xs hover:bg-neutral-50 dark:hover:bg-neutral-700 text-gray-800 dark:text-gray-200"
 							onClick={() => {
 								if (!document.fullscreenElement) {
 									containerRef.current?.requestFullscreen();
@@ -1298,9 +1312,13 @@ export default function CourseGraph({ courseId: initialCourseId, courses }: Cour
 							}}
 							title="Toggle fullscreen"
 						>
-							<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+							<svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+								<path d="M4 8V4h4M4 4l6 6" />
+								<path d="M20 8V4h-4m4 0l-6 6" />
+								<path d="M4 16v4h4m-4 0l6-6" />
+								<path d="M20 16v4h-4m4 0l-6-6" />
 							</svg>
+							<span className="hidden sm:inline">Fullscreen</span>
 						</button>
 					</div>
 
@@ -1404,15 +1422,15 @@ export default function CourseGraph({ courseId: initialCourseId, courses }: Cour
 						</div>
 						)}
 						<button
-							className="bg-white/90 dark:bg-neutral-800/90 backdrop-blur rounded-lg border border-gray-200 dark:border-gray-700 shadow px-3 py-2 text-xs hover:bg-neutral-50 dark:hover:bg-neutral-700 flex items-center gap-2"
+							className="inline-flex items-center gap-2 bg-white/90 dark:bg-neutral-800/90 backdrop-blur rounded-lg border border-gray-200 dark:border-gray-700 shadow px-3 py-2 text-xs hover:bg-neutral-50 dark:hover:bg-neutral-700 text-gray-800 dark:text-gray-200"
 							onClick={() => setShowSettings(!showSettings)}
 							title="Toggle settings"
 						>
-							<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+							<svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+								<path d="M12 15a3 3 0 100-6 3 3 0 000 6z" />
+								<path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 008 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004 15a1.65 1.65 0 00-1.51-1H2a2 2 0 010-4h.09A1.65 1.65 0 004 8a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 008 4a1.65 1.65 0 001-1.51V2a2 2 0 014 0v.09A1.65 1.65 0 0015 4c.48 0 .93-.17 1.28-.46l.06-.06a2 2 0 012.83 2.83l-.06.06c-.29.35-.46.8-.46 1.28 0 .6.23 1.13.6 1.51.38.38.6.91.6 1.51s-.22 1.13-.6 1.51c-.37.38-.6.91-.6 1.51z" />
 							</svg>
-							{showSettings ? 'Hide' : 'Show'} Settings
+							<span className="hidden sm:inline">{showSettings ? 'Hide' : 'Show'} Settings</span>
 						</button>
 					</div>
 

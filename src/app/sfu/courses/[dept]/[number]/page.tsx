@@ -13,7 +13,8 @@ export async function generateStaticParams() {
   try {
     const courses = await getAllCourses();
     const params = courses.map((course) => ({
-      dept: String(course.dept).toLowerCase(),
+      // Keep original casing to match links like /sfu/courses/CMPT/105W
+      dept: String(course.dept),
       number: String(course.number),
     }));
     console.log(`Generated ${params.length} static params for courses`);
@@ -23,6 +24,9 @@ export async function generateStaticParams() {
     return [];
   }
 }
+
+// With static export, only the paths from generateStaticParams are valid
+// export const dynamicParams = false;
 
 export default async function CoursePage({ params }: PageProps) {
   const resolvedParams = await params;
