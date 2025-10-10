@@ -40,7 +40,7 @@ export default async function SFUCoursesPage() {
                       .map((course) => (
                         <Link
                           key={course.id}
-                          href={`/sfu/courses/${course.dept}/${course.number}`}
+                          href={`/sfu/courses/${course.dept.toLowerCase()}/${course.number.toLowerCase()}`}
                           className="block p-4 border border-gray-200 dark:border-gray-600 rounded-lg hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-gray-800 transition-colors bg-white dark:bg-gray-900"
                         >
                           <div className="font-semibold text-gray-900 dark:text-white">

@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { type Course } from '../../../../../utils/courseApi';
+import Link from "next/link";
 
 type SFUPrereqNode = {
   type: string;
@@ -1287,8 +1288,8 @@ export default function CourseGraph({ courseId: initialCourseId, courses }: Cour
 			>
 				{/* Home button - top left */}
 				<div data-pan-block className="absolute top-2 left-2 z-20">
-					<a
-						href="/sfu"
+					<Link
+						href="/sfu/courses"
 						className="inline-flex items-center gap-2 bg-white/90 dark:bg-neutral-800/90 backdrop-blur rounded-lg border border-gray-200 dark:border-gray-700 shadow px-3 py-2 text-xs hover:bg-neutral-50 dark:hover:bg-neutral-700 text-gray-800 dark:text-gray-200"
 						title="Home"
 					>
@@ -1297,7 +1298,7 @@ export default function CourseGraph({ courseId: initialCourseId, courses }: Cour
 							<path d="M5 10v9a1 1 0 001 1h4v-6h4v6h4a1 1 0 001-1v-9" />
 						</svg>
 						<span className="hidden sm:inline">Home</span>
-					</a>
+					</Link>
 				</div>
 					{/* Fullscreen button - top right */}
 					<div data-pan-block className="absolute top-2 right-2 z-20">
