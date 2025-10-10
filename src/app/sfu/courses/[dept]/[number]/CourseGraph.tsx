@@ -309,6 +309,7 @@ function NodeCard({
 								<>
 									This course hasn&apos;t been parsed yet. Contribute today at{" "}
 									<a
+										data-pan-block
 										href="https://crowdsource.sfucourses.com"
 										className="underline hover:opacity-80"
 										target="_blank"
