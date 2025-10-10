@@ -26,9 +26,9 @@ export async function generateStaticParams() {
 }
 
 // With static export, only the paths from generateStaticParams are valid
-export const dynamicParams = false;
+// export const dynamicParams = false;
 // Ensure this route is fully static
-export const revalidate = false;
+// export const revalidate = false;
 
 export default async function CoursePage({ params }: PageProps) {
   const resolvedParams = await params;
