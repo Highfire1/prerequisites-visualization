@@ -100,3 +100,68 @@ export async function getCourseMap(): Promise<Map<string, Course>> {
 
     return courseMapCache;
 }
+
+// Helper to parse prerequisite courses from parsed_prerequisites tree
+function extractCourseIdsFromPrereqs(prereqNode: Record<string, unknown>, collected: Set<string> = new Set()): Set<string> {
+    if (!prereqNode) return collected;
+    
+    // Handle course node
+    if (prereqNode.type === 'course' && prereqNode.department && prereqNode.number) {
+        collected.add(`${prereqNode.department} ${prereqNode.number}`);
+    }
+    
+    // Handle HSCourse node
+    if (prereqNode.type === 'HSCourse' && prereqNode.course) {
+        collected.add(prereqNode.course as string);
+    }
+    
+    // Recurse into children
+    if (prereqNode.children && Array.isArray(prereqNode.children)) {
+        prereqNode.children.forEach((child: Record<string, unknown>) => extractCourseIdsFromPrereqs(child, collected));
+    }
+    
+    return collected;
+}
+
+// Get only the courses needed for a specific course's prerequisite graph
+export async function getCoursesForGraph(dept: string, number: string): Promise<Course[]> {
+    const allCourses = await getAllCourses();
+    const courseMap = new Map<string, Course>();
+    allCourses.forEach(c => courseMap.set(`${c.dept} ${c.number}`, c));
+    
+    const rootCourse = await getCourseByDeptAndNumber(dept, number);
+    if (!rootCourse) {
+        return [];
+    }
+    
+    const neededCourseIds = new Set<string>([`${rootCourse.dept} ${rootCourse.number}`]);
+    const toProcess = [rootCourse];
+    const processed = new Set<string>();
+    
+    // BFS to collect all prerequisite courses
+    while (toProcess.length > 0) {
+        const current = toProcess.shift()!;
+        const currentId = `${current.dept} ${current.number}`;
+        
+        if (processed.has(currentId)) continue;
+        processed.add(currentId);
+        
+        if (current.parsed_prerequisites) {
+            const prereqIds = extractCourseIdsFromPrereqs(current.parsed_prerequisites);
+            prereqIds.forEach(prereqId => {
+                if (!neededCourseIds.has(prereqId)) {
+                    neededCourseIds.add(prereqId);
+                    const prereqCourse = courseMap.get(prereqId);
+                    if (prereqCourse) {
+                        toProcess.push(prereqCourse);
+                    }
+                }
+            });
+        }
+    }
+    
+    // Return only the courses that are needed
+    return Array.from(neededCourseIds)
+        .map(id => courseMap.get(id))
+        .filter((c): c is Course => c !== undefined);
+}

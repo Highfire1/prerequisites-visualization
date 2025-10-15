@@ -1,6 +1,6 @@
-import CourseGraph from './CourseGraph';
-import { getAllCourses, getCourseByDeptAndNumber } from '../../../../../utils/courseApi';
-import { fetchOutlines } from '../../../../../utils/sfuOutlinesApi';
+import CourseGraph from "./CourseGraph";
+import { getCourseByDeptAndNumber, getCoursesForGraph } from "../../../../../utils/courseApi";
+import { fetchOutlines } from "../../../../../utils/sfuOutlinesApi";
 
 interface PageProps {
   params: Promise<{
@@ -9,49 +9,32 @@ interface PageProps {
   }>;
 }
 
-// Generate static paths for all courses from API
 export async function generateStaticParams() {
-  try {
-    // Prefer official outlines API to enumerate ALL courses
-    const outlines = await fetchOutlines();
-    const params = outlines.map((o) => ({
-      dept: String(o.dept).toLowerCase(),
-      number: String(o.number).toLowerCase(),
-    }));
-    // Fallback: if outlines unexpectedly empty, use crowdsourced list
-    if (params.length === 0) {
-      const courses = await getAllCourses();
-      return courses.map((course) => ({ dept: String(course.dept).toLowerCase(), number: String(course.number).toLowerCase() }));
-    }
-    return params;
-  } catch (error) {
-    console.error('Error generating static params from outlines:', error);
-    try {
-      const courses = await getAllCourses();
-      return courses.map((course) => ({ dept: String(course.dept).toLowerCase(), number: String(course.number).toLowerCase() }));
-    } catch (e) {
-      console.error('Error falling back to crowdsourced params:', e);
-      return [];
-    }
+  const outlines = await fetchOutlines();
+  const params = outlines.map((o) => ({
+    dept: String(o.dept).toLowerCase(),
+    number: String(o.number).toLowerCase(),
+  }));
+
+  if (params.length === 0) {
+    throw new Error("Outlines API returned no data; cannot generate static params");
   }
+  
+  return params;
 }
 
-// With static export, only the paths from generateStaticParams are valid
 export const dynamicParams = false;
-// Ensure this route is fully static
 export const revalidate = false;
 
 export default async function CoursePage({ params }: PageProps) {
   const resolvedParams = await params;
   const courseId = `${resolvedParams.dept.toUpperCase()} ${resolvedParams.number.toUpperCase()}`;
 
-  // Fetch the crowdsourced data (may not include every course)
-  const [allCourses, course] = await Promise.all([
-    getAllCourses(),
+  const [neededCourses, course] = await Promise.all([
+    getCoursesForGraph(resolvedParams.dept, resolvedParams.number.toUpperCase()),
     getCourseByDeptAndNumber(resolvedParams.dept, resolvedParams.number.toUpperCase()),
   ]);
 
-  // If this course exists in outlines but not in our crowdsourced data, show a helpful message
   if (!course) {
     return (
       <div className="flex items-center justify-center h-screen bg-white dark:bg-black">
@@ -79,10 +62,9 @@ export default async function CoursePage({ params }: PageProps) {
     );
   }
 
-  // Render the graph regardless; the component will indicate when data is missing for a course
   return (
     <div className="w-full h-screen bg-white dark:bg-black">
-      <CourseGraph courseId={courseId} courses={allCourses} />
+      <CourseGraph courseId={courseId} courses={neededCourses} />
     </div>
   );
 }
