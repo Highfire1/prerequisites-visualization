@@ -8,15 +8,25 @@ type SFUPrereqNode = {
   type: string;
   logic?: string;
   children?: SFUPrereqNode[];
+  // course fields
   department?: string;
   number?: string;
   minGrade?: string;
-  course?: string;
+  canBeTakenConcurrently?: string;
   orEquivalent?: string;
+  // HSCourse fields
+  course?: string;
+  // creditCount/courseCount fields
   count?: number;
   level?: string;
   credits?: number;
+  // permission/other fields
   note?: string;
+  // program fields
+  program?: string;
+  // CGPA/UDGPA fields
+  minCGPA?: number;
+  minUDGPA?: number;
 };
 
 type PrereqNode = SFUPrereqNode;
@@ -186,15 +196,72 @@ function NodeCard({
 	const renderNode = (node: PrereqNode): React.ReactNode => {
 		if (!node) return null;
 		
+		// course: department, number, minGrade? (optional), canBeTakenConcurrently? (optional), orEquivalent? (optional)
 		if (node.type === "course" && node.department && node.number) {
 			const courseId = `${node.department} ${node.number}`;
-			return renderTranscript(courseId, node.minGrade);
+			const extras: string[] = [];
+			if (node.minGrade) extras.push(`min: ${node.minGrade}`);
+			if (node.canBeTakenConcurrently === "true") extras.push("concurrent");
+			if (node.orEquivalent === "true") extras.push("or equiv");
+			
+			return (
+				<div className="inline-flex items-center gap-1">
+					{renderTranscript(courseId, undefined)}
+					{extras.length > 0 && (
+						<span className="text-gray-500 dark:text-gray-400 text-[10px]">
+							({extras.join(", ")})
+						</span>
+					)}
+				</div>
+			);
 		}
 		
+		// HSCourse: course, minGrade? (optional), orEquivalent? (optional)
 		if (node.type === "HSCourse" && node.course) {
-			return renderTranscript(node.course, node.minGrade);
+			const extras: string[] = [];
+			if (node.minGrade) extras.push(`min: ${node.minGrade}`);
+			if (node.orEquivalent === "true") extras.push("or equiv");
+			
+			return (
+				<div className="inline-flex items-center gap-1">
+					{renderTranscript(node.course, undefined)}
+					{extras.length > 0 && (
+						<span className="text-gray-500 dark:text-gray-400 text-[10px]">
+							({extras.join(", ")})
+						</span>
+					)}
+				</div>
+			);
 		}
 		
+		// program: program (required)
+		if (node.type === "program" && (node as any).program) {
+			return (
+				<div className="text-gray-700 dark:text-gray-300 text-xs">
+					Must be in <span className="font-medium">{(node as any).program}</span> program
+				</div>
+			);
+		}
+		
+		// CGPA: minCGPA (required)
+		if (node.type === "CGPA" && (node as any).minCGPA != null) {
+			return (
+				<div className="text-gray-700 dark:text-gray-300 text-xs">
+					Min CGPA: <span className="font-medium">{(node as any).minCGPA}</span>
+				</div>
+			);
+		}
+		
+		// UDGPA: minUDGPA (required)
+		if (node.type === "UDGPA" && (node as any).minUDGPA != null) {
+			return (
+				<div className="text-gray-700 dark:text-gray-300 text-xs">
+					Min Upper Division GPA: <span className="font-medium">{(node as any).minUDGPA}</span>
+				</div>
+			);
+		}
+		
+		// group: logic (ALL_OF, ONE_OF, TWO_OF), children
 		if (node.type === "group") {
 			type Child = Exclude<PrereqNode, null>;
 			const children = (node.children ?? []).filter(Boolean) as Child[];
@@ -202,6 +269,27 @@ function NodeCard({
 			
 			const isCourseNode = (n: PrereqNode): boolean => 
 				!!n && ((n.type === "course" && !!n.department && !!n.number) || (n.type === "HSCourse" && !!n.course));
+			
+			// Handle TWO_OF logic
+			if (node.logic === "TWO_OF") {
+				return (
+					<div className="flex flex-col gap-1 text-xs">
+						<div className="text-gray-600 dark:text-gray-400 text-[10px] font-medium mb-0.5">
+							(Choose 2 of the following)
+						</div>
+						{children.map((c, idx) => (
+							<React.Fragment key={idx}>
+								<div className="pl-2 border-l border-dashed border-gray-300 dark:border-gray-600">
+									{renderNode(c)}
+								</div>
+								{idx < children.length - 1 ? (
+									<div className="text-gray-500 dark:text-gray-400 pl-2">or</div>
+								) : null}
+							</React.Fragment>
+						))}
+					</div>
+				);
+			}
 			
 			if (node.logic === "ONE_OF") {
 				const allCourses = children.every((c) => isCourseNode(c));
@@ -263,15 +351,47 @@ function NodeCard({
 				</div>
 			);
 		}
-		if (node.type === "creditCount") {
-			return <div className="text-gray-600 dark:text-gray-400 text-xs">{node.credits} credits</div>;
+		
+		// creditCount: credits (required), department? (optional), level? (optional), minGrade? (optional), canBeTakenConcurrently? (optional)
+		if (node.type === "creditCount" && node.credits != null) {
+			const parts: string[] = [`${node.credits} credits`];
+			if (node.department) {
+				const deptStr = Array.isArray(node.department) ? node.department.join("/") : node.department;
+				parts.push(`in ${deptStr}`);
+			}
+			if (node.level) parts.push(`(${node.level})`);
+			if (node.minGrade) parts.push(`min: ${node.minGrade}`);
+			if (node.canBeTakenConcurrently === "true") parts.push("(concurrent)");
+			return <div className="text-gray-600 dark:text-gray-400 text-xs">{parts.join(" ")}</div>;
 		}
-		if (node.type === "courseCount") {
-			return <div className="text-gray-600 dark:text-gray-400 text-xs">{node.count} courses from {node.department} {node.level}</div>;
+		
+		// courseCount: count (required), department? (optional), level? (optional), minGrade? (optional), canBeTakenConcurrently? (optional)
+		if (node.type === "courseCount" && node.count != null) {
+			const parts: string[] = [`${node.count} ${node.count === 1 ? "course" : "courses"}`];
+			if (node.department) {
+				const deptStr = Array.isArray(node.department) ? node.department.join("/") : node.department;
+				parts.push(`from ${deptStr}`);
+			}
+			if (node.level) parts.push(`(${node.level})`);
+			if (node.minGrade) parts.push(`min: ${node.minGrade}`);
+			if (node.canBeTakenConcurrently === "true") parts.push("(concurrent)");
+			return <div className="text-gray-600 dark:text-gray-400 text-xs">{parts.join(" ")}</div>;
 		}
-		if (node.type === "permission" || node.type === "other") {
-			return <div className="text-gray-800 dark:text-gray-200 text-xs">{node.note}</div>;
+		
+		// permission: note (required)
+		if (node.type === "permission" && node.note) {
+			return (
+				<div className="text-gray-700 dark:text-gray-300 text-xs">
+					<span className="font-medium">Permission required:</span> {node.note}
+				</div>
+			);
 		}
+		
+		// other: note (required)
+		if (node.type === "other" && node.note) {
+			return <div className="text-gray-700 dark:text-gray-300 text-xs">{node.note}</div>;
+		}
+		
 		return null;
 	};
 
