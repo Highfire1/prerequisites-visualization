@@ -235,28 +235,28 @@ function NodeCard({
 		}
 		
 		// program: program (required)
-		if (node.type === "program" && (node as any).program) {
+		if (node.type === "program" && node.program) {
 			return (
 				<div className="text-gray-700 dark:text-gray-300 text-xs">
-					Must be in <span className="font-medium">{(node as any).program}</span> program
+					Must be in <span className="font-medium">{node.program}</span> program
 				</div>
 			);
 		}
 		
 		// CGPA: minCGPA (required)
-		if (node.type === "CGPA" && (node as any).minCGPA != null) {
+		if (node.type === "CGPA" && node.minCGPA != null) {
 			return (
 				<div className="text-gray-700 dark:text-gray-300 text-xs">
-					Min CGPA: <span className="font-medium">{(node as any).minCGPA}</span>
+					Min CGPA: <span className="font-medium">{node.minCGPA}</span>
 				</div>
 			);
 		}
 		
 		// UDGPA: minUDGPA (required)
-		if (node.type === "UDGPA" && (node as any).minUDGPA != null) {
+		if (node.type === "UDGPA" && node.minUDGPA != null) {
 			return (
 				<div className="text-gray-700 dark:text-gray-300 text-xs">
-					Min Upper Division GPA: <span className="font-medium">{(node as any).minUDGPA}</span>
+					Min Upper Division GPA: <span className="font-medium">{node.minUDGPA}</span>
 				</div>
 			);
 		}
