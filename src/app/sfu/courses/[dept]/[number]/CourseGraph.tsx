@@ -344,7 +344,7 @@ function NodeCard({
 						<React.Fragment key={idx}>
 							<div className="pl-2 border-l border-dashed border-gray-300 dark:border-gray-600">{renderNode(c)}</div>
 							{idx < children.length - 1 ? (
-								<div className="pl-2">and</div>
+								<div className="text-gray-500 dark:text-gray-400 pl-2">and</div>
 							) : null}
 						</React.Fragment>
 					))}
@@ -381,7 +381,7 @@ function NodeCard({
 		// permission: note (required)
 		if (node.type === "permission" && node.note) {
 			return (
-				<div className="text-gray-700 dark:text-gray-300 text-xs">
+				<div className="text-xs">
 					<span className="font-medium">Permission required:</span> {node.note}
 				</div>
 			);
@@ -389,7 +389,7 @@ function NodeCard({
 		
 		// other: note (required)
 		if (node.type === "other" && node.note) {
-			return <div className="text-gray-700 dark:text-gray-300 text-xs">{node.note}</div>;
+			return <div className="text-xs">{node.note}</div>;
 		}
 		
 		return null;
