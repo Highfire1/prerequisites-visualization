@@ -246,7 +246,7 @@ function NodeCard({
 		// CGPA: minCGPA (required)
 		if (node.type === "CGPA" && node.minCGPA != null) {
 			return (
-				<div className="text-gray-700 dark:text-gray-300 text-xs">
+				<div className="text-xs">
 					Min CGPA: <span className="font-medium">{node.minCGPA}</span>
 				</div>
 			);
@@ -255,7 +255,7 @@ function NodeCard({
 		// UDGPA: minUDGPA (required)
 		if (node.type === "UDGPA" && node.minUDGPA != null) {
 			return (
-				<div className="text-gray-700 dark:text-gray-300 text-xs">
+				<div className="text-xs">
 					Min Upper Division GPA: <span className="font-medium">{node.minUDGPA}</span>
 				</div>
 			);
@@ -344,7 +344,7 @@ function NodeCard({
 						<React.Fragment key={idx}>
 							<div className="pl-2 border-l border-dashed border-gray-300 dark:border-gray-600">{renderNode(c)}</div>
 							{idx < children.length - 1 ? (
-								<div className="text-gray-500 dark:text-gray-400 pl-2">and</div>
+								<div className="pl-2">and</div>
 							) : null}
 						</React.Fragment>
 					))}
@@ -362,7 +362,7 @@ function NodeCard({
 			if (node.level) parts.push(`(${node.level})`);
 			if (node.minGrade) parts.push(`min: ${node.minGrade}`);
 			if (node.canBeTakenConcurrently === "true") parts.push("(concurrent)");
-			return <div className="text-gray-600 dark:text-gray-400 text-xs">{parts.join(" ")}</div>;
+			return <div className="text-xs">{parts.join(" ")}</div>;
 		}
 		
 		// courseCount: count (required), department? (optional), level? (optional), minGrade? (optional), canBeTakenConcurrently? (optional)
@@ -375,7 +375,7 @@ function NodeCard({
 			if (node.level) parts.push(`(${node.level})`);
 			if (node.minGrade) parts.push(`min: ${node.minGrade}`);
 			if (node.canBeTakenConcurrently === "true") parts.push("(concurrent)");
-			return <div className="text-gray-600 dark:text-gray-400 text-xs">{parts.join(" ")}</div>;
+			return <div className="text-xs">{parts.join(" ")}</div>;
 		}
 		
 		// permission: note (required)
